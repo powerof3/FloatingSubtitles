@@ -9,10 +9,10 @@ void StartPoint::Init()
 	if (!player) {
 		return;
 	}
-	
+
 	debug = player->GetPosition();
 	debug.z += player->eyeHeight;
-	
+
 	if (auto worldRoot = RE::Main::WorldRootNode(); !worldRoot->children.empty()) {
 		camera = worldRoot->children.front()->local.translate;
 	} else if (auto pcCamera = RE::PlayerCamera::GetSingleton(); pcCamera && pcCamera->cameraRoot) {

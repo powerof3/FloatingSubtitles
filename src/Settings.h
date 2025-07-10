@@ -29,7 +29,7 @@ private:
 
 	const wchar_t* defaultMCMPath{ L"Data/MCM/Config/FloatingSubtitles/settings.ini" };
 	const wchar_t* userMCMPath{ L"Data/MCM/Settings/FloatingSubtitles.ini" };
-	
+
 	const wchar_t* defaultBTPSPath{ L"Data/MCM/Config/BetterThirdPersonSelection/settings.ini" };
 	const wchar_t* userBTPSPath{ L"Data/MCM/Settings/BetterThirdPersonSelection.ini" };
 

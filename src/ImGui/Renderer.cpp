@@ -100,7 +100,7 @@ namespace ImGui::Renderer
 			{
 				// disable windowing
 				GImGui->NavWindowingTarget = nullptr;
-				
+
 				Subtitles::Manager::GetSingleton()->Draw();
 			}
 			ImGui::EndFrame();

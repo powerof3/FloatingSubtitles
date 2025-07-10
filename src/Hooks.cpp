@@ -52,8 +52,7 @@ namespace Hooks
 							"BookMode"sv,
 							"JournalMode"sv
 						};
-						if (std::ranges::any_of(badModes, [&](const auto& mode) {
-							return hudData->text == mode; })) {
+						if (std::ranges::any_of(badModes, [&](const auto& mode) { return hudData->text == mode; })) {
 							Subtitles::Manager::GetSingleton()->SetVisible(!hudData->show);
 						}
 					}

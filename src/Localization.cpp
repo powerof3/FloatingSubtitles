@@ -76,7 +76,8 @@ namespace Subtitles
 
 		if (language == Language::kNative) {
 			language = gameLanguage;
-			a_ini.SetLongValue("Settings", langKey.c_str(), std::to_underlying(language));;
+			a_ini.SetLongValue("Settings", langKey.c_str(), std::to_underlying(language));
+			;
 		}
 
 		std::string maxCharKey = std::string("iMaxCharactersPerLine").append(a_section);

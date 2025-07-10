@@ -101,9 +101,9 @@ namespace Subtitles
 
 		showDualSubs = a_ini.GetBoolValue("Settings", "bDualSubtitles", showDualSubs);
 		subtitleSpacing = static_cast<float>(a_ini.GetDoubleValue("Settings", "fDualSubtitleSpacing", subtitleSpacing));
-		
+
 		staticSubtitles = a_ini.GetBoolValue("Settings", "bStaticSubtitles", staticSubtitles);
-		
+
 		useBTPSWidgetPosition = a_ini.GetBoolValue("Settings", "bUseBTPSWidgetPosition", useBTPSWidgetPosition);
 	}
 
