@@ -15,6 +15,10 @@ void Settings::SerializeINI(const wchar_t* a_path, const INIFunc a_func, bool a_
 
 	a_func(ini);
 
+	if (!a_generate) {
+		return;
+	}
+
 	(void)ini.SaveFile(a_path);
 }
 
@@ -32,6 +36,11 @@ void Settings::LoadMCMSettings() const
 	});
 
 	Subtitles::Manager::GetSingleton()->PostMCMSettingsLoad();
+}
+
+void Settings::LoadSettingsBTPS(INIFunc a_func) const
+{
+	SerializeINI(defaultBTPSPath, a_func, false);
 }
 
 void Settings::SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, INIFunc a_func)

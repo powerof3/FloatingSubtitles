@@ -105,7 +105,6 @@ namespace Subtitles
 		// members
 		mutable RWLock                       subtitleLock;
 		FlatMap<std::string, DualSubtitle>   processedSubtitles;
-		FlatMap<RE::ObjectRefHandle, ImVec2> smoothedAnchorCache;
 		Settings                             previous;
 		Settings                             current;
 		float                                maxDistanceStartSq{ 4194304.0f };

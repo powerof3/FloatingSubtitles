@@ -16,6 +16,8 @@ public:
 	void SerializeStyles(INIFunc a_func) const;
 	void SerializeFonts(INIFunc a_func) const;
 
+	void LoadSettingsBTPS(INIFunc a_func) const;
+
 private:
 	static void SerializeINI(const wchar_t* a_path, INIFunc a_func, bool a_generate = false);
 	static void SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, INIFunc a_func);

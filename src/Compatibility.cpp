@@ -1,6 +1,7 @@
 #include "Compatibility.h"
 
 #include "RE.h"
+#include "Settings.h"
 
 float DisplayTweaks::GetResolutionScale()
 {
@@ -20,14 +21,16 @@ void BetterThirdPersonSelection::GetAPI()
 	api = reinterpret_cast<BTPS_API_decl::API_V0*>(BTPS_API_decl::RequestPluginAPI_V0());
 	if (api) {
 		logger::info("Obtained BTPS API");
+		Settings::GetSingleton()->LoadSettingsBTPS([](auto& ini) {
+			auto widgetPos = ini.GetDoubleValue("Widgets", "fWidgetZOffsetAdditionalNPC", std::numeric_limits<double>::max());  // only available in updated BTPS with new API functions
+			if (widgetPos == std::numeric_limits<double>::max()) {
+				logger::warn("\tBTPS API is outdated!");
+				api = nullptr;
+			}
+		});
 	} else {
 		logger::info("Unable to acquire BTPS API");
 	}
-}
-
-bool BetterThirdPersonSelection::IsEnabled()
-{
-	return api != nullptr;
 }
 
 RE::NiPoint3 BetterThirdPersonSelection::GetBTPSWidgetPos()

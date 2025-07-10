@@ -15,7 +15,6 @@ namespace DisplayTweaks
 namespace BetterThirdPersonSelection
 {
 	void         GetAPI();
-	bool         IsEnabled();
 	RE::NiPoint3 GetBTPSWidgetPos();
 
 	// member
