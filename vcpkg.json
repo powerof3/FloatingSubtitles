@@ -1,0 +1,28 @@
+{
+  "name": "floating-subtitles",
+  "version-string": "1.0.0",
+  "description": "",
+  "homepage": "",
+  "license": "MIT",
+  "dependencies": [
+    "boost-unordered",
+    "clib-util",
+    "freetype",
+    "glm",
+    {
+      "name": "imgui",
+      "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]
+    },
+    "rsm-binary-io",
+    "srell",
+    "spdlog",
+    "xbyak"
+  ],
+  "builtin-baseline": "96fd599859beaed2ae891a2b2982746f28611b07",
+  "overrides": [
+    {
+      "name": "xbyak",
+      "version": "7.23.1"
+    }
+  ]
+}

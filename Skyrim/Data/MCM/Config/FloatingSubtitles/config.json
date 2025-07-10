@@ -1,0 +1,224 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Exit-9B/MCM-Helper/main/docs/config.schema.json",
+  "modName": "FloatingSubtitles",
+  "displayName": "$FSUB_Title_Text",
+  "minMcmVersion": 13,
+  "pluginRequirements": [ "FloatingSubtitles.esp" ],
+  "cursorFillMode": "topToBottom",
+  "pages": [
+    {
+      "pageDisplayName": "$FSUB_SettingsPage",
+      "cursorFillMode": "topToBottom",
+      "content": [
+        {
+          "id": "bGeneralSubtitles:Settings",
+          "text": "$FSUB_ShowGeneralSubtitles_Text",
+          "type": "toggle",
+          "help": "$FSUB_ShowGeneralSubtitles_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bDialogueSubtitles:Settings",
+          "text": "$FSUB_ShowDialogueSubtitles_Text",
+          "type": "toggle",
+          "help": "$FSUB_ShowDialogueSubtitles_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "id": "fMaxDistanceFromSpeaker:Settings",
+          "text": "$FSUB_MaxDistanceFromSpeaker_Text",
+          "type": "slider",
+          "help": "$FSUB_MaxDistanceFromSpeaker_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 256,
+            "max": 8192,
+            "step": 1.0,
+            "formatString": "{2}"
+          }
+        },
+        {
+          "id": "fHeadOffset:Settings",
+          "text": "$FSUB_SubtitleHeadOffset_Text",
+          "type": "slider",
+          "help": "$FSUB_SubtitleHeadOffset_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 0,
+            "max": 100,
+            "step": 1.0,
+            "formatString": "{2}"
+          }
+        },
+        {
+          "id": "bStaticSubtitles:Settings",
+          "text": "$FSUB_StaticSubtitles_Text",
+          "type": "toggle",
+          "help": "$FSUB_StaticSubtitles_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bUseBTPSWidgetPosition:Settings",
+          "text": "$FSUB_UseBTPSWidgetPosition_Text",
+          "type": "toggle",
+          "help": "$FSUB_UseBTPSWidgetPosition_Help",
+          "groupCondition": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "id": "bRequireLineOfSight:Settings",
+          "text": "$FSUB_RequireLineOfSight_Text",
+          "type": "toggle",
+          "help": "$FSUB_RequireLineOfSight_Help",
+          "groupControl": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFadeOutOfSightSubtitles:Settings",
+          "text": "$FSUB_FadeOutOfSightSubtitles_Text",
+          "type": "toggle",
+          "help": "$FSUB_FadeOutOfSightSubtitles_Help",
+          "groupCondition": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "fFadedSubtitleOpacity:Settings",
+          "text": "$FSUB_FadedSubtitleOpacity_Text",
+          "type": "slider",
+          "help": "$FSUB_FadedSubtitleOpacity_Help",
+          "groupCondition": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 0.0,
+            "max": 1.0,
+            "step": 0.1,
+            "formatString": "{2}"
+          }
+        },
+        {
+          "id": "bDualSubtitles:Settings",
+          "text": "$FSUB_DualSubtitles_Text",
+          "type": "toggle",
+          "help": "$FSUB_DualSubtitles_Help",
+          "position": 1,
+          "groupControl": 2,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "id": "iLanguagePrimary:Settings",
+          "text": "$FSUB_PrimaryLanguage_Text",
+          "type": "enum",
+          "help": "$FSUB_PrimaryLanguage_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "options": [
+              "$FSUB_LanguageChinese_Text",
+              "$FSUB_LanguageCzech_Text",
+              "$FSUB_LanguageEnglish_Text",
+              "$FSUB_LanguageFrench_Text",
+              "$FSUB_LanguageGerman_Text",
+              "$FSUB_LanguageItalian_Text",
+              "$FSUB_LanguageJapanese_Text",
+              "$FSUB_LanguageKorean_Text",
+              "$FSUB_LanguagePolish_Text",
+              "$FSUB_LanguagePortuguese_Text",
+              "$FSUB_LanguageRussian_Text",
+              "$FSUB_LanguageSpanish_Text"
+            ]
+          }
+        },
+        {
+          "id": "iMaxCharactersPerLinePrimary:Settings",
+          "text": "$FSUB_MaxCharactersPerLine_Text",
+          "type": "slider",
+          "help": "$FSUB_MaxCharactersPerLine_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "min": 1,
+            "max": 200,
+            "step": 1.0
+          }
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "id": "fDualSubtitleSpacing:Settings",
+          "text": "$FSUB_DualSubtitleSpacing_Text",
+          "type": "slider",
+          "help": "$FSUB_DualSubtitleSpacing_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingFloat",
+            "min": 0.0,
+            "max": 2.0,
+            "step": 0.1,
+            "formatString": "{2}"
+          }
+        },
+        {
+          "type": "empty"
+        },
+        {
+          "id": "iLanguageSecondary:Settings",
+          "text": "$FSUB_SecondaryLanguage_Text",
+          "type": "enum",
+          "help": "$FSUB_SecondaryLanguage_Help",
+          "groupCondition": 2,
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "options": [
+              "$FSUB_LanguageChinese_Text",
+              "$FSUB_LanguageCzech_Text",
+              "$FSUB_LanguageEnglish_Text",
+              "$FSUB_LanguageFrench_Text",
+              "$FSUB_LanguageGerman_Text",
+              "$FSUB_LanguageItalian_Text",
+              "$FSUB_LanguageJapanese_Text",
+              "$FSUB_LanguageKorean_Text",
+              "$FSUB_LanguagePolish_Text",
+              "$FSUB_LanguagePortuguese_Text",
+              "$FSUB_LanguageRussian_Text",
+              "$FSUB_LanguageSpanish_Text"
+            ]
+          }
+        },
+        {
+          "id": "iMaxCharactersPerLineSecondary:Settings",
+          "text": "$FSUB_MaxCharactersPerLine_Text",
+          "type": "slider",
+          "help": "$FSUB_MaxCharactersPerLine_Help",
+          "groupCondition": 2,
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "min": 1,
+            "max": 200,
+            "step": 1.0
+          }
+        }
+      ]
+    }
+  ]
+}

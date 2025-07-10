@@ -1,0 +1,88 @@
+#pragma once
+
+namespace RE
+{
+	struct StringFileInfo
+	{
+		struct Entry
+		{
+			std::uint32_t id;
+			std::uint32_t offset;
+		};
+
+		Entry*                              entryArray;
+		std::uint8_t*                       stringBlock;
+		std::uint32_t                       stringBlockSize;
+		std::uint32_t                       stringBlockOffset;
+		BSTSmartPointer<BSResource::Stream> stream;
+		BSSpinLock                          lock;
+		BSFixedString                       filePath;
+		std::uint32_t                       unk30;
+	};
+
+	[[nodiscard]] inline static auto GetILStringMap() -> BSTHashMap<BSFixedString, StringFileInfo*>&
+	{
+		REL::Relocation<BSTHashMap<BSFixedString, StringFileInfo*>*> map{ RELOCATION_ID(501146, 359462) };
+		return *map;
+	}
+
+	// https://en.uesp.net/wiki/Tes5Mod:String_Table_File_Format
+	struct ILStringTable
+	{
+		struct DirectoryEntry
+		{
+			std::uint32_t stringID;  //	String ID
+			std::uint32_t offset;    //	Offset (relative to beginning of data) to the string.
+		};
+
+		ILStringTable(const std::vector<std::byte>& a_buffer);
+		std::string GetStringAtOffset(std::uint32_t offset) const;
+
+		// members
+		std::uint32_t               entryCount;  // Number of entries in the string table.
+		std::uint32_t               dataSize;    // Size of string data that follows after header and directory.
+		std::vector<DirectoryEntry> directory;
+		std::vector<std::byte>      rawData;
+
+	private:
+		// increments offset
+		static void read_uint32(std::uint32_t& val, const std::vector<std::byte>& a_buffer, std::uint32_t& a_bufferPosition);
+	};
+
+	class SubtitleInfoEx : public SubtitleInfo
+	{
+	public:
+		enum class Flag
+		{
+			kNone = 0,
+			kObscured = 1 << 0,
+			kTypeDialogue = 1 << 1,
+			kCrosshairRef = 1 << 2,
+		};
+
+		std::uint8_t& flagsRaw() { return pad1D; }
+		bool          isFlagSet(Flag a_flag) const { return (pad1D & static_cast<std::uint8_t>(a_flag)) != 0; }
+
+		void setFlag(Flag a_flag, bool a_set);
+	};
+
+	bool            IsCrosshairRef(const RE::TESObjectREFRPtr& a_ref);
+	RE::NiAVObject* GetHeadNode(const RE::TESObjectREFRPtr& a_ref);
+	bool            HasLOSToTarget(RE::PlayerCharacter* a_player, RE::TESObjectREFR* a_target, bool& pickPerformed);
+	void            QueueDialogSubtitles(const char* a_text);
+	std::string     GetINISettingString(std::string_view a_setting);
+	bool            GetINIPrefsSettingBool(std::string_view a_setting);
+	bool            ShowGeneralSubsGame();
+	bool            ShowDialogueSubsGame();
+
+	template <class... Args>
+	bool DispatchStaticCall(RE::BSFixedString a_class, RE::BSFixedString a_fnName, Args&&... a_args)
+	{
+		if (auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton()) {
+			RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
+			auto                                                     args = RE::MakeFunctionArguments(std::forward<Args>(a_args)...);
+			return vm->DispatchStaticCall(a_class, a_fnName, args, callback);
+		}
+		return false;
+	}
+}

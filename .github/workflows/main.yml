@@ -1,0 +1,31 @@
+name: Main
+
+on:
+  push:
+    branches: '**'
+    tags: '*'
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run:
+    uses: adya/pack-skse-mod/.github/workflows/pack.yml@main
+    with:
+      AE_353_BRANCH: master
+      AE_353_COMMON_LIB_BRANCH: dev-1.6.640
+      FOMOD_INCLUDE_PDB: true
+      FOMOD_MOD_NAME: "Floating Subtitles"
+      FOMOD_MOD_AUTHOR: "powerofthree"
+      FOMOD_MOD_NEXUS_ID: "154424"
+      FOMOD_AE353_PATH: 'AE640/SKSE/Plugins'
+      FOMOD_AE353_NAME: 'SSE v1.6.640 ("Anniversary Edition")'
+      FOMOD_AE353_DESCR: 'Select this if you are using Skyrim Anniversary Edition v1.6.640'
+      FOMOD_AE353_MIN_GAME_VERSION: '1.6.629.0'
+      FOMOD_AE_NAME: 'SSE v1.6.1170+ ("Anniversary Edition")'
+      FOMOD_AE_DESCR: 'Select this if you are using Skyrim Anniversary Edition v1.6.1170 or higher (latest update).'
+      FOMOD_AE_MIN_GAME_VERSION: '1.6.1130.0'
+      FOMOD_REQUIRED_INSTALLATION_DIR: "Skyrim/Data"
+      PUBLISH_ARCHIVE_TYPE: '7z'
+      VCPKG_COMMIT_ID: '96fd599859beaed2ae891a2b2982746f28611b07'

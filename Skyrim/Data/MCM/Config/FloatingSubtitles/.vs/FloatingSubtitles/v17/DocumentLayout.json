@@ -1,0 +1,208 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_SPANISH.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_RUSSIAN.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_POLISH.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_JAPANESE.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_ITALIAN.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_GERMAN.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\settings.ini||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:settings.ini||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FloatingSubtitles_SPANISH.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_SPANISH.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_SPANISH.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_SPANISH.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_SPANISH.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.394Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FloatingSubtitles_RUSSIAN.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_RUSSIAN.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_RUSSIAN.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_RUSSIAN.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_RUSSIAN.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.346Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "FloatingSubtitles_POLISH.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_POLISH.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_POLISH.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_POLISH.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_POLISH.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.315Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FloatingSubtitles_JAPANESE.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_JAPANESE.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_JAPANESE.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_JAPANESE.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_JAPANESE.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.236Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FloatingSubtitles_ITALIAN.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_ITALIAN.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_ITALIAN.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_ITALIAN.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_ITALIAN.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.204Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "FloatingSubtitles_GERMAN.txt",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_GERMAN.txt",
+              "RelativeDocumentMoniker": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_GERMAN.txt",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\Interface\\Translations\\FloatingSubtitles_GERMAN.txt",
+              "RelativeToolTip": "..\\..\\..\\Interface\\Translations\\FloatingSubtitles_GERMAN.txt",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2025-07-09T20:21:38.157Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "settings.ini",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\settings.ini",
+              "RelativeDocumentMoniker": "settings.ini",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\settings.ini",
+              "RelativeToolTip": "settings.ini",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002768|",
+              "WhenOpened": "2025-07-09T20:20:21.058Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "config.json",
+              "DocumentMoniker": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\config.json",
+              "RelativeDocumentMoniker": "config.json",
+              "ToolTip": "D:\\Modding\\MO2 Files\\Skyrim Special Edition\\mods\\FloatingSubtitles\\MCM\\Config\\FloatingSubtitles\\config.json",
+              "RelativeToolTip": "config.json",
+              "ViewState": "AgIAAC0AAAAAAAAAAAAAADsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-09T20:14:15.653Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{68487888-204a-11d3-87eb-00c04f7971a5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{8294f124-07d1-574c-bf4d-1c4a34e31c86}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{2e7065be-2911-5d06-9444-328203e57925}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
