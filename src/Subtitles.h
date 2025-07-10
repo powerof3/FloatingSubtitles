@@ -103,13 +103,13 @@ namespace Subtitles
 		void                RebuildProcessedSubtitles();
 
 		// members
-		mutable RWLock                       subtitleLock;
-		FlatMap<std::string, DualSubtitle>   processedSubtitles;
-		Settings                             previous;
-		Settings                             current;
-		float                                maxDistanceStartSq{ 4194304.0f };
-		float                                maxDistanceEndSq{ 4624220.16f };
-		bool                                 visible{ true };
-		LocalizedSubtitles                   localizedSubs;
+		mutable RWLock                     subtitleLock;
+		FlatMap<std::string, DualSubtitle> processedSubtitles;
+		Settings                           previous;
+		Settings                           current;
+		float                              maxDistanceStartSq{ 4194304.0f };
+		float                              maxDistanceEndSq{ 4624220.16f };
+		bool                               visible{ true };
+		LocalizedSubtitles                 localizedSubs;
 	};
 }

@@ -22,7 +22,6 @@ void OnInit(SKSE::MessagingInterface::Message* a_msg)
 			logger::info("{:*^30}", "POST POST LOAD");
 
 			BetterThirdPersonSelection::GetAPI();
-
 		}
 		break;
 	case SKSE::MessagingInterface::kDataLoaded:
