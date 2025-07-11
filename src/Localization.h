@@ -37,6 +37,16 @@ namespace Subtitles
 		std::uint32_t maxCharsPerLine{ 150 };
 	};
 
+	struct LocalizedSubtitle
+	{
+		bool empty() const { return subtitle.empty(); }
+		bool operator==(const LocalizedSubtitle& rhs) const { return subtitle == rhs.subtitle; }
+		bool operator!=(const LocalizedSubtitle& rhs) const { return subtitle != rhs.subtitle; }
+
+		std::string   subtitle;
+		std::uint32_t maxCharsPerLine;
+	};
+
 	class LocalizedSubtitles
 	{
 	public:
@@ -45,14 +55,11 @@ namespace Subtitles
 		bool LoadMCMSettings(CSimpleIniA& a_ini);
 		void PostMCMSettingsLoad();
 
-		std::string GetPrimarySubtitle(const char* a_localSubtitle);
-		std::string GetSecondarySubtitle(const char* a_localSubtitle);
-
-		std::uint32_t                       GetMaxCharactersPrimary() const { return primaryLanguage.maxCharsPerLine; }
-		std::uint32_t                       GetMaxCharactersSecondary() const { return secondaryLanguage.maxCharsPerLine; }
+		LocalizedSubtitle GetPrimarySubtitle(const char* a_localSubtitle);
+		LocalizedSubtitle GetSecondarySubtitle(const char* a_localSubtitle);
 
 	private:
-		using SubtitleID = uint64_t;  // hashed id (string id + mod index)
+		using SubtitleID = std::uint64_t;  // hashed id (string id + mod index)
 
 		using MultiSubtitleToIDMap = FlatMap<std::string, FlatSet<SubtitleID>>;
 		using MultiIDToSubtitleMap = FlatMap<SubtitleID, FlatMap<Language, FlatSet<std::string>>>;
@@ -63,7 +70,7 @@ namespace Subtitles
 		void ReadILStringFiles(MultiSubtitleToIDMap& a_multiSubToID, MultiIDToSubtitleMap& a_multiIDToSub) const;
 		void MergeDuplicateSubtitles(const MultiSubtitleToIDMap& a_multiSubToID, const MultiIDToSubtitleMap& a_multiIDToSub);
 
-		std::string ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
+		LocalizedSubtitle ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
 
 		// members
 		Language        gameLanguage{ Language::kEnglish };

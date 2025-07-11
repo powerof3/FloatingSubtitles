@@ -9,21 +9,9 @@
 
 namespace Subtitles
 {
-	Subtitle::Subtitle(const std::string& a_subtitle, std::uint32_t a_maxChars) :
-		lines(WrapText(a_subtitle, a_maxChars))
+	Subtitle::Subtitle(const LocalizedSubtitle& a_primarySubtitle) :
+		lines(WrapText(a_primarySubtitle.subtitle, a_primarySubtitle.maxCharsPerLine))
 	{}
-
-	void Subtitle::DrawSubtitle(const ImVec2& a_screenPos, const ImGui::StyleParams& a_params, float a_lineHeight, float& a_startPosY) const
-	{
-		auto* drawList = ImGui::GetForegroundDrawList();
-
-		for (const auto& line : lines) {
-			const ImVec2 textPos(a_screenPos.x - line.lineSize.x * 0.5f, a_startPosY);
-			drawList->AddText(textPos + a_params.shadowOffset, a_params.shadowColor, line.line.c_str());
-			drawList->AddText(textPos, a_params.textColor, line.line.c_str());
-			a_startPosY += a_lineHeight;
-		}
-	}
 
 	std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uint32_t maxWidth)
 	{
@@ -46,16 +34,31 @@ namespace Subtitles
 			lines.emplace_back(currentLine, ImGui::CalcTextSize(currentLine.c_str()));
 		}
 
+		std::ranges::reverse(lines); // for drawing lines from bottom to top
+
 		return lines;
 	}
 
-	DualSubtitle::DualSubtitle(const std::string& a_subtitle, std::uint32_t a_maxChars) :
-		primary(a_subtitle, a_maxChars)
+	void Subtitle::DrawSubtitle(float a_posX, float& a_posY, const ImGui::StyleParams& a_params, float a_lineHeight) const
+	{
+		auto* drawList = ImGui::GetForegroundDrawList();
+
+		for (const auto& [line, size] : lines) {
+			a_posY -= a_lineHeight;
+
+			const ImVec2 textPos(a_posX - size.x * 0.5f, a_posY);
+			drawList->AddText(textPos + a_params.shadowOffset, a_params.shadowColor, line.c_str());
+			drawList->AddText(textPos, a_params.textColor, line.c_str());
+		}
+	}
+
+	DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle) :
+		primary(a_primarySubtitle)
 	{}
 
-	DualSubtitle::DualSubtitle(const std::string& a_primarySub, std::uint32_t a_maxCharsPrimary, const std::string& a_secondarySub, std::uint32_t a_maxCharsSecondary) :
-		primary(a_primarySub, a_maxCharsPrimary),
-		secondary(a_secondarySub, a_maxCharsSecondary)
+	DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const LocalizedSubtitle& a_secondarySubtitle) :
+		primary(a_primarySubtitle),
+		secondary(a_secondarySubtitle)
 	{}
 
 	void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
@@ -66,19 +69,15 @@ namespace Subtitles
 		}
 
 		const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(alpha);
+		const auto  lineHeight = ImGui::GetTextLineHeight();
+		auto        posY = screenPos.y;
 
-		const auto totalLines = primary.lines.size() + secondary.lines.size();
-		const auto lineHeight = ImGui::GetTextLineHeight();
-		const auto totalHeight = totalLines * lineHeight;
-
-		auto posY = screenPos.y - totalHeight;
+		primary.DrawSubtitle(screenPos.x, posY, styleParams, lineHeight);
 
 		if (!secondary.lines.empty()) {
-			secondary.DrawSubtitle(screenPos, styleParams, lineHeight, posY);
-			posY += (ImGui::GetTextLineHeightWithSpacing() * spacing);
-		}
-
-		primary.DrawSubtitle(screenPos, styleParams, lineHeight, posY);
+			posY -= lineHeight * spacing;
+			secondary.DrawSubtitle(screenPos.x, posY, styleParams, lineHeight);
+		};
 	}
 
 	void Manager::OnDataLoaded()
@@ -196,12 +195,10 @@ namespace Subtitles
 		if (current.showDualSubs) {
 			auto secondarySub = localizedSubs.GetSecondarySubtitle(subtitle);
 			if (!primarySub.empty() && !secondarySub.empty() && primarySub != secondarySub) {
-				return DualSubtitle(
-					primarySub, localizedSubs.GetMaxCharactersPrimary(),
-					secondarySub, localizedSubs.GetMaxCharactersSecondary());
+				return DualSubtitle(primarySub, secondarySub);
 			}
 		}
-		return DualSubtitle(primarySub, localizedSubs.GetMaxCharactersPrimary());
+		return DualSubtitle(primarySub);
 	}
 
 	void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* subtitle)

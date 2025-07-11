@@ -26,9 +26,9 @@ namespace Subtitles
 		};
 
 		Subtitle() = default;
-		Subtitle(const std::string& a_subtitle, std::uint32_t a_maxChars);
+		Subtitle(const LocalizedSubtitle& a_subtitle);
 
-		void DrawSubtitle(const ImVec2& a_screenPos, const ImGui::StyleParams& a_params, float a_lineHeight, float& a_startPosY) const;
+		void DrawSubtitle(float a_posX, float& a_posY, const ImGui::StyleParams& a_params, float a_lineHeight) const;
 
 		std::vector<Line> lines;
 
@@ -39,8 +39,8 @@ namespace Subtitles
 	struct DualSubtitle
 	{
 		DualSubtitle() = default;
-		DualSubtitle(const std::string& a_subtitle, std::uint32_t a_maxChars);
-		DualSubtitle(const std::string& a_primarySub, std::uint32_t a_maxCharsPrimary, const std::string& a_secondarySub, std::uint32_t a_maxCharsSecondary);
+		DualSubtitle(const LocalizedSubtitle& a_subtitle);
+		DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const LocalizedSubtitle& a_secondarySubtitle);
 
 		void DrawDualSubtitle(const ScreenParams& a_screenParams) const;
 
