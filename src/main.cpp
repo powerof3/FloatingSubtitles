@@ -12,23 +12,20 @@ void OnInit(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kPostLoad:
 		{
 			logger::info("{:*^30}", "POST LOAD");
-
-			Settings::GetSingleton()->LoadSettings();
+			Compatibility::DisplayTweaks::LoadSettings();
 			Hooks::Install();
 		}
 		break;
 	case SKSE::MessagingInterface::kPostPostLoad:
 		{
 			logger::info("{:*^30}", "POST POST LOAD");
-
-			BetterThirdPersonSelection::GetAPI();
+			Compatibility::BTPS::GetAPI();
 		}
 		break;
 	case SKSE::MessagingInterface::kDataLoaded:
 		{
 			logger::info("{:*^30}", "DATA LOADED");
 			Subtitles::Manager::GetSingleton()->OnDataLoaded();
-			Settings::GetSingleton()->LoadMCMSettings();
 		}
 		break;
 	default:

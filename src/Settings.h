@@ -10,13 +10,11 @@ public:
 		return &instance;
 	};
 
-	void LoadSettings() const;
-	void LoadMCMSettings() const;
-
 	void SerializeStyles(INIFunc a_func) const;
 	void SerializeFonts(INIFunc a_func) const;
-
-	void LoadSettingsBTPS(INIFunc a_func) const;
+	void SerializeMCM(INIFunc a_func) const;
+	void SerializeBTPS(INIFunc a_func) const;
+	void SerializeDisplayTweaks(INIFunc a_func) const;
 
 private:
 	static void SerializeINI(const wchar_t* a_path, INIFunc a_func, bool a_generate = false);

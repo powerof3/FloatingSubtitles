@@ -53,9 +53,7 @@ namespace Subtitles
 	{
 	public:
 		void OnDataLoaded();
-
-		void LoadMCMSettings(CSimpleIniA& a_ini);
-		void PostMCMSettingsLoad();
+		void LoadMCMSettings();
 
 		void Draw();
 
@@ -69,7 +67,7 @@ namespace Subtitles
 		bool ShowDialogueSubtitles() const;
 
 	private:
-		struct Settings
+		struct MCMSettings
 		{
 			void LoadMCMSettings(CSimpleIniA& a_ini);
 
@@ -91,6 +89,8 @@ namespace Subtitles
 		using ReadLocker = std::shared_lock<RWLock>;
 		using WriteLocker = std::unique_lock<RWLock>;
 
+		void LoadMCMSettings(CSimpleIniA& a_ini);
+
 		bool IsVisible() const;
 
 		RE::NiPoint3 CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
@@ -103,8 +103,8 @@ namespace Subtitles
 		// members
 		mutable RWLock                     subtitleLock;
 		FlatMap<std::string, DualSubtitle> processedSubtitles;
-		Settings                           previous;
-		Settings                           current;
+		MCMSettings                        previous;
+		MCMSettings                        current;
 		float                              maxDistanceStartSq{ 4194304.0f };
 		float                              maxDistanceEndSq{ 4624220.16f };
 		bool                               visible{ true };

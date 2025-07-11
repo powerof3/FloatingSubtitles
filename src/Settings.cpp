@@ -1,9 +1,5 @@
 #include "Settings.h"
 
-#include "Compatibility.h"
-#include "ImGui/Renderer.h"
-#include "Subtitles.h"
-
 void Settings::SerializeINI(const wchar_t* a_path, const INIFunc a_func, bool a_generate)
 {
 	CSimpleIniA ini;
@@ -22,27 +18,6 @@ void Settings::SerializeINI(const wchar_t* a_path, const INIFunc a_func, bool a_
 	(void)ini.SaveFile(a_path);
 }
 
-void Settings::LoadSettings() const
-{
-	SerializeINI(defaultDisplayTweaksPath, userDisplayTweaksPath, [](auto& ini) {
-		DisplayTweaks::LoadSettings(ini);
-	});
-}
-
-void Settings::LoadMCMSettings() const
-{
-	SerializeINI(defaultMCMPath, userMCMPath, [](auto& ini) {
-		Subtitles::Manager::GetSingleton()->LoadMCMSettings(ini);
-	});
-
-	Subtitles::Manager::GetSingleton()->PostMCMSettingsLoad();
-}
-
-void Settings::LoadSettingsBTPS(INIFunc a_func) const
-{
-	SerializeINI(defaultBTPSPath, a_func, false);
-}
-
 void Settings::SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, INIFunc a_func)
 {
 	SerializeINI(a_defaultPath, a_func);
@@ -57,4 +32,19 @@ void Settings::SerializeStyles(INIFunc a_func) const
 void Settings::SerializeFonts(INIFunc a_func) const
 {
 	SerializeINI(fontsPath, a_func, true);
+}
+
+void Settings::SerializeMCM(INIFunc a_func) const
+{
+	SerializeINI(defaultMCMPath, userMCMPath, a_func);
+}
+
+void Settings::SerializeBTPS(INIFunc a_func) const
+{
+	SerializeINI(defaultBTPSPath, userBTPSPath, a_func);
+}
+
+void Settings::SerializeDisplayTweaks(INIFunc a_func) const
+{
+	SerializeINI(defaultDisplayTweaksPath, userDisplayTweaksPath, a_func);
 }

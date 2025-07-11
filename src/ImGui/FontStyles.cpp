@@ -10,7 +10,7 @@ namespace ImGui
 		name = a_ini.GetValue(a_section, "sFont", "");
 		name = R"(Data/Interface/ImGuiIcons/Fonts/)" + name;
 
-		const auto resolutionScale = DisplayTweaks::GetResolutionScale();
+		const auto resolutionScale = Compatibility::DisplayTweaks::GetResolutionScale();
 		size = std::roundf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
 
 		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", -1.5));
@@ -69,7 +69,7 @@ namespace ImGui
 		colors[ImGuiCol_Text] = user.text;
 		user.shadowOffset = ImVec2(user.shadowOffsetVar, user.shadowOffsetVar);
 
-		style.ScaleAllSizes(DisplayTweaks::GetResolutionScale());
+		style.ScaleAllSizes(Compatibility::DisplayTweaks::GetResolutionScale());
 
 		GetStyle() = style;
 

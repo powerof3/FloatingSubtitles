@@ -5,6 +5,7 @@
 #include "ImGui/Renderer.h"
 #include "ImGui/Util.h"
 #include "RayCaster.h"
+#include "Settings.h"
 
 namespace Subtitles
 {
@@ -83,16 +84,30 @@ namespace Subtitles
 	void Manager::OnDataLoaded()
 	{
 		localizedSubs.BuildLocalizedSubtitles();
+
+		LoadMCMSettings();
 	}
 
-	void Manager::Settings::LoadMCMSettings(CSimpleIniA& a_ini)
+	void Manager::LoadMCMSettings()
+	{
+		Settings::GetSingleton()->SerializeMCM([this](auto& ini) {
+			LoadMCMSettings(ini);
+		});
+
+		localizedSubs.PostMCMSettingsLoad();
+
+		maxDistanceStartSq = current.maxDistanceStart * current.maxDistanceStart;
+		maxDistanceEndSq = (current.maxDistanceStart * 1.05f) * (current.maxDistanceStart * 1.05f);
+	}
+
+	void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 	{
 		showGeneralSubtitles = a_ini.GetBoolValue("Settings", "bGeneralSubtitles", showGeneralSubtitles);
 		showDialogueSubtitles = a_ini.GetBoolValue("Settings", "bDialogueSubtitles", showDialogueSubtitles);
 
 		maxDistanceStart = static_cast<float>(a_ini.GetDoubleValue("Settings", "fMaxDistanceFromSpeaker", maxDistanceStart));
 
-		subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * DisplayTweaks::GetResolutionScale();
+		subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * Compatibility::DisplayTweaks::GetResolutionScale();
 
 		doRayCastChecks = a_ini.GetBoolValue("Settings", "bEnableRaycastChecks", doRayCastChecks);
 
@@ -123,14 +138,6 @@ namespace Subtitles
 		if (previous.showDualSubs != current.showDualSubs || rebuildSubs) {
 			RebuildProcessedSubtitles();
 		}
-	}
-
-	void Manager::PostMCMSettingsLoad()
-	{
-		localizedSubs.PostMCMSettingsLoad();
-
-		maxDistanceStartSq = current.maxDistanceStart * current.maxDistanceStart;
-		maxDistanceEndSq = (current.maxDistanceStart * 1.05f) * (current.maxDistanceStart * 1.05f);
 	}
 
 	bool Manager::IsVisible() const
@@ -169,7 +176,7 @@ namespace Subtitles
 		float offset{};
 
 		if (crosshairTarget) {
-			pos = BetterThirdPersonSelection::GetBTPSWidgetPos();
+			pos = Compatibility::BTPS::GetWidgetPos();
 			offset = current.subtitleHeadOffset * 0.75f;
 		}
 
@@ -338,7 +345,7 @@ namespace Subtitles
 
 						params.spacing = current.subtitleSpacing;
 
-						GetProcessedSubtitles(subtitleInfo.subtitle).DrawDualSubtitle(params);
+						GetProcessedSubtitles(subtitleInfo.subtitle).DrawDualSubtitle(params);	
 					}
 				}
 			}
