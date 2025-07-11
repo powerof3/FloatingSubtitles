@@ -34,7 +34,7 @@ namespace Subtitles
 			lines.emplace_back(currentLine, ImGui::CalcTextSize(currentLine.c_str()));
 		}
 
-		std::ranges::reverse(lines); // for drawing lines from bottom to top
+		std::ranges::reverse(lines);  // for drawing lines from bottom to top
 
 		return lines;
 	}
