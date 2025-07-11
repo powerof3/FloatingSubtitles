@@ -345,7 +345,7 @@ namespace Subtitles
 
 						params.spacing = current.subtitleSpacing;
 
-						GetProcessedSubtitles(subtitleInfo.subtitle).DrawDualSubtitle(params);	
+						GetProcessedSubtitles(subtitleInfo.subtitle).DrawDualSubtitle(params);
 					}
 				}
 			}
