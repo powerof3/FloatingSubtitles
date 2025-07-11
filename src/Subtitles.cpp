@@ -9,7 +9,7 @@
 
 namespace Subtitles
 {
-	Subtitle::Subtitle(const char* a_subtitle, std::uint32_t a_maxChars) :
+	Subtitle::Subtitle(const std::string& a_subtitle, std::uint32_t a_maxChars) :
 		lines(WrapText(a_subtitle, a_maxChars))
 	{}
 
@@ -25,7 +25,7 @@ namespace Subtitles
 		}
 	}
 
-	std::vector<Subtitle::Line> Subtitle::WrapText(const char* text, std::uint32_t maxWidth)
+	std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uint32_t maxWidth)
 	{
 		std::vector<Line>  lines;
 		std::istringstream wordStream(text);
@@ -49,13 +49,13 @@ namespace Subtitles
 		return lines;
 	}
 
-	DualSubtitle::DualSubtitle(const char* a_subtitle, std::uint32_t a_maxChars) :
+	DualSubtitle::DualSubtitle(const std::string& a_subtitle, std::uint32_t a_maxChars) :
 		primary(a_subtitle, a_maxChars)
 	{}
 
 	DualSubtitle::DualSubtitle(const std::string& a_primarySub, std::uint32_t a_maxCharsPrimary, const std::string& a_secondarySub, std::uint32_t a_maxCharsSecondary) :
-		primary(a_primarySub.c_str(), a_maxCharsPrimary),
-		secondary(a_secondarySub.c_str(), a_maxCharsSecondary)
+		primary(a_primarySub, a_maxCharsPrimary),
+		secondary(a_secondarySub, a_maxCharsSecondary)
 	{}
 
 	void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
@@ -192,15 +192,16 @@ namespace Subtitles
 
 	DualSubtitle Manager::CreateDualSubtitles(const char* subtitle)
 	{
+		auto primarySub = localizedSubs.GetPrimarySubtitle(subtitle);
 		if (current.showDualSubs) {
-			auto [primarySub, secondarySub] = localizedSubs.GetTranslatedSubtitles(subtitle);
+			auto secondarySub = localizedSubs.GetSecondarySubtitle(subtitle);
 			if (!primarySub.empty() && !secondarySub.empty() && primarySub != secondarySub) {
 				return DualSubtitle(
 					primarySub, localizedSubs.GetMaxCharactersPrimary(),
 					secondarySub, localizedSubs.GetMaxCharactersSecondary());
 			}
 		}
-		return DualSubtitle(subtitle, localizedSubs.GetMaxCharactersPrimary());
+		return DualSubtitle(primarySub, localizedSubs.GetMaxCharactersPrimary());
 	}
 
 	void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* subtitle)

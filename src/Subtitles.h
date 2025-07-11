@@ -26,20 +26,20 @@ namespace Subtitles
 		};
 
 		Subtitle() = default;
-		Subtitle(const char* a_subtitle, std::uint32_t a_maxChars);
+		Subtitle(const std::string& a_subtitle, std::uint32_t a_maxChars);
 
 		void DrawSubtitle(const ImVec2& a_screenPos, const ImGui::StyleParams& a_params, float a_lineHeight, float& a_startPosY) const;
 
 		std::vector<Line> lines;
 
 	private:
-		static std::vector<Line> WrapText(const char* text, std::uint32_t maxWidth);
+		static std::vector<Line> WrapText(const std::string& text, std::uint32_t maxWidth);
 	};
 
 	struct DualSubtitle
 	{
 		DualSubtitle() = default;
-		DualSubtitle(const char* a_subtitle, std::uint32_t a_maxChars);
+		DualSubtitle(const std::string& a_subtitle, std::uint32_t a_maxChars);
 		DualSubtitle(const std::string& a_primarySub, std::uint32_t a_maxCharsPrimary, const std::string& a_secondarySub, std::uint32_t a_maxCharsSecondary);
 
 		void DrawDualSubtitle(const ScreenParams& a_screenParams) const;

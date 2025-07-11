@@ -45,7 +45,9 @@ namespace Subtitles
 		bool LoadMCMSettings(CSimpleIniA& a_ini);
 		void PostMCMSettingsLoad();
 
-		std::pair<std::string, std::string> GetTranslatedSubtitles(const char* a_localSubtitle);
+		std::string GetPrimarySubtitle(const char* a_localSubtitle);
+		std::string GetSecondarySubtitle(const char* a_localSubtitle);
+
 		std::uint32_t                       GetMaxCharactersPrimary() const { return primaryLanguage.maxCharsPerLine; }
 		std::uint32_t                       GetMaxCharactersSecondary() const { return secondaryLanguage.maxCharsPerLine; }
 
@@ -60,6 +62,8 @@ namespace Subtitles
 
 		void ReadILStringFiles(MultiSubtitleToIDMap& a_multiSubToID, MultiIDToSubtitleMap& a_multiIDToSub) const;
 		void MergeDuplicateSubtitles(const MultiSubtitleToIDMap& a_multiSubToID, const MultiIDToSubtitleMap& a_multiIDToSub);
+
+		std::string ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
 
 		// members
 		Language        gameLanguage{ Language::kEnglish };

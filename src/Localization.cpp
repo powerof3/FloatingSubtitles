@@ -212,35 +212,37 @@ namespace Subtitles
 		logger::info("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.duration(), subtitleToID.size());
 	}
 
-	std::pair<std::string, std::string> LocalizedSubtitles::GetTranslatedSubtitles(const char* a_localSubtitle)
+	std::string LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const
 	{
-		const auto resolve_subtitle = [&](LanguageSetting& a_setting) -> std::string {
-			if (a_setting == gameLanguage) {
-				return a_localSubtitle;
-			}
-
-			auto idIt = subtitleToID.find(a_localSubtitle);
-			if (idIt == subtitleToID.end()) {
-				return {};
-			}
-
-			auto mapIt = idToSubtitle.find(idIt->second);
-			if (mapIt == idToSubtitle.end()) {
-				return {};
-			}
-
-			auto subtitleIt = mapIt->second.find(a_setting.language);
-			if (subtitleIt == mapIt->second.end()) {
-				return {};
-			}
-
-			return subtitleIt->second;
-		};
-
-		if (primaryLanguage == secondaryLanguage) {
-			return {};
+		if (a_language == gameLanguage) {
+			return a_localSubtitle;
 		}
 
-		return { resolve_subtitle(primaryLanguage), resolve_subtitle(secondaryLanguage) };
+		auto idIt = subtitleToID.find(a_localSubtitle);
+		if (idIt == subtitleToID.end()) {
+			return a_localSubtitle;
+		}
+
+		auto mapIt = idToSubtitle.find(idIt->second);
+		if (mapIt == idToSubtitle.end()) {
+			return a_localSubtitle;
+		}
+
+		auto subtitleIt = mapIt->second.find(a_language.language);
+		if (subtitleIt == mapIt->second.end()) {
+			return a_localSubtitle;
+		}
+
+		return subtitleIt->second;
+	}
+
+	std::string LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle)
+	{
+		return ResolveSubtitle(a_localSubtitle, primaryLanguage);
+	}
+
+	std::string LocalizedSubtitles::GetSecondarySubtitle(const char* a_localSubtitle)
+	{
+		return ResolveSubtitle(a_localSubtitle, secondaryLanguage);
 	}
 }
