@@ -102,8 +102,6 @@ namespace Subtitles
 		showDualSubs = a_ini.GetBoolValue("Settings", "bDualSubtitles", showDualSubs);
 		subtitleSpacing = static_cast<float>(a_ini.GetDoubleValue("Settings", "fDualSubtitleSpacing", subtitleSpacing));
 
-		staticSubtitles = a_ini.GetBoolValue("Settings", "bStaticSubtitles", staticSubtitles);
-
 		useBTPSWidgetPosition = a_ini.GetBoolValue("Settings", "bUseBTPSWidgetPosition", useBTPSWidgetPosition);
 	}
 
@@ -153,12 +151,7 @@ namespace Subtitles
 	{
 		RE::NiPoint3 pos = a_ref->GetPosition();
 		if (const auto headNode = RE::GetHeadNode(a_ref)) {
-			const auto& headPos = headNode->world.translate;
-			if (current.staticSubtitles) {
-				pos.z = headPos.z;
-			} else {
-				pos = headPos;
-			}
+			pos = headNode->world.translate;
 		} else {
 			pos.z += a_height;
 		}
@@ -176,13 +169,7 @@ namespace Subtitles
 		float offset{};
 
 		if (crosshairTarget) {
-			auto btpsPos = BetterThirdPersonSelection::GetBTPSWidgetPos();
-			if (current.staticSubtitles) {
-				pos = ref->GetPosition();
-				pos.z = btpsPos.z;
-			} else {
-				pos = btpsPos;
-			}
+			pos = BetterThirdPersonSelection::GetBTPSWidgetPos();
 			offset = current.subtitleHeadOffset * 0.75f;
 		}
 

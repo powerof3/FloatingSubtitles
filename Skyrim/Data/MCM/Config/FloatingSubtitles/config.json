@@ -58,15 +58,6 @@
           }
         },
         {
-          "id": "bStaticSubtitles:Settings",
-          "text": "$FSUB_StaticSubtitles_Text",
-          "type": "toggle",
-          "help": "$FSUB_StaticSubtitles_Help",
-          "valueOptions": {
-            "sourceType": "ModSettingBool"
-          }
-        },
-        {
           "id": "bUseBTPSWidgetPosition:Settings",
           "text": "$FSUB_UseBTPSWidgetPosition_Text",
           "type": "toggle",

@@ -79,8 +79,6 @@ namespace Subtitles
 			bool  showGeneralSubtitles{ true };
 			bool  showDialogueSubtitles{ false };
 			bool  showDualSubs{ false };
-			bool  staticSubtitles{ false };
-			bool  BTPSInstalled{ false };
 			bool  useBTPSWidgetPosition{ true };
 			bool  doRayCastChecks{ true };
 			bool  fadeSubtitles{ true };
