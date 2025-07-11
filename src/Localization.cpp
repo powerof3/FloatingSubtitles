@@ -209,7 +209,7 @@ namespace Subtitles
 
 		timer.end();
 
-		logger::info("Parsing ILString files took {}", timer.duration());
+		logger::info("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.duration(), subtitleToID.size());
 	}
 
 	std::pair<std::string, std::string> LocalizedSubtitles::GetTranslatedSubtitles(const char* a_localSubtitle)

@@ -25,15 +25,18 @@ namespace Compatibility
 	{
 		api = reinterpret_cast<BTPS_API_decl::API_V0*>(BTPS_API_decl::RequestPluginAPI_V0());
 		if (api) {
-			logger::info("Obtained BTPS API");
+			logger::info("Retrieving BTPS API...");
 			Settings::GetSingleton()->SerializeBTPS([](auto& ini) {
-				if (api == nullptr) {
+				if (api == nullptr || validAPI) {
 					return;
 				}
 				auto widgetPos = ini.GetDoubleValue("Widgets", "fWidgetZOffsetAdditionalNPC", std::numeric_limits<double>::max());  // only available in updated BTPS with new API functions
 				if (widgetPos == std::numeric_limits<double>::max()) {
 					logger::warn("\tBTPS API is outdated!");
 					api = nullptr;
+				} else {
+					logger::info("\tBTPS API is up to date!");
+					validAPI = true;
 				}
 			});
 		} else {

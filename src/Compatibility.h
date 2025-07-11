@@ -20,6 +20,7 @@ namespace Compatibility
 		RE::NiPoint3 GetWidgetPos();
 
 		// member
-		inline BTPS_API_decl::API_V0* api;
+		inline BTPS_API_decl::API_V0* api{};
+		inline bool                   validAPI{ false };
 	}
 }
