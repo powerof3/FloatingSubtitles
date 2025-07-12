@@ -41,7 +41,7 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayC
 	}
 
 	const auto rootCollidable = static_cast<const RE::hkpCollidable*>(body);
-	auto rootColFilter = rootCollidable->broadPhaseHandle.collisionFilterInfo;
+	auto       rootColFilter = rootCollidable->broadPhaseHandle.collisionFilterInfo;
 
 	switch (rootColFilter.GetCollisionLayer()) {
 	case RE::COL_LAYER::kUnidentified:
