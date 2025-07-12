@@ -73,7 +73,6 @@ namespace Subtitles
 
 			float subtitleHeadOffset{ 15.0f };
 			float subtitleSpacing{ 0.5f };
-			float maxDistanceStart{ 2048.0f };
 			bool  showGeneralSubtitles{ true };
 			bool  showDialogueSubtitles{ false };
 			bool  showDualSubs{ false };

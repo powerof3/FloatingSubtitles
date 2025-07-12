@@ -82,8 +82,13 @@ namespace Subtitles
 	void Manager::OnDataLoaded()
 	{
 		localizedSubs.BuildLocalizedSubtitles();
-
 		LoadMCMSettings();
+
+		const auto gameMaxDistance = RE::GetINISettingFloat("fMaxSubtitleDistance:Interface");
+		maxDistanceStartSq = gameMaxDistance * gameMaxDistance;
+		maxDistanceEndSq = (gameMaxDistance * 1.05f) * (gameMaxDistance * 1.05f);
+
+		logger::info("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
 	}
 
 	void Manager::LoadMCMSettings()
@@ -93,17 +98,12 @@ namespace Subtitles
 		});
 
 		localizedSubs.PostMCMSettingsLoad();
-
-		maxDistanceStartSq = current.maxDistanceStart * current.maxDistanceStart;
-		maxDistanceEndSq = (current.maxDistanceStart * 1.05f) * (current.maxDistanceStart * 1.05f);
 	}
 
 	void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 	{
 		showGeneralSubtitles = a_ini.GetBoolValue("Settings", "bGeneralSubtitles", showGeneralSubtitles);
 		showDialogueSubtitles = a_ini.GetBoolValue("Settings", "bDialogueSubtitles", showDialogueSubtitles);
-
-		maxDistanceStart = static_cast<float>(a_ini.GetDoubleValue("Settings", "fMaxDistanceFromSpeaker", maxDistanceStart));
 
 		subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * ModAPIHandler::GetSingleton()->GetResolutionScale();
 

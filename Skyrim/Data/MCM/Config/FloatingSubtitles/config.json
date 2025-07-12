@@ -32,19 +32,6 @@
           "type": "empty"
         },
         {
-          "id": "fMaxDistanceFromSpeaker:Settings",
-          "text": "$FSUB_MaxDistanceFromSpeaker_Text",
-          "type": "slider",
-          "help": "$FSUB_MaxDistanceFromSpeaker_Help",
-          "valueOptions": {
-            "sourceType": "ModSettingFloat",
-            "min": 256,
-            "max": 8192,
-            "step": 1.0,
-            "formatString": "{2}"
-          }
-        },
-        {
           "id": "fHeadOffset:Settings",
           "text": "$FSUB_SubtitleHeadOffset_Text",
           "type": "slider",

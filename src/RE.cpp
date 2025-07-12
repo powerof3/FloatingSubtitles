@@ -87,6 +87,11 @@ namespace RE
 		return string::toupper(INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetString());
 	}
 
+	float GetINISettingFloat(std::string_view a_setting)
+	{
+		return INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetFloat();
+	}
+
 	bool GetINIPrefsSettingBool(std::string_view a_setting)
 	{
 		return INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting)->GetBool();

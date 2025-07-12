@@ -72,6 +72,7 @@ namespace RE
 	bool        HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed);
 	void        QueueDialogSubtitles(const char* a_text);
 	std::string GetINISettingString(std::string_view a_setting);
+	float       GetINISettingFloat(std::string_view a_setting);
 	bool        GetINIPrefsSettingBool(std::string_view a_setting);
 	bool        ShowGeneralSubsGame();
 	bool        ShowDialogueSubsGame();
