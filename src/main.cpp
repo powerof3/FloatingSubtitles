@@ -1,6 +1,6 @@
-#include "Compatibility.h"
 #include "Hooks.h"
 #include "ImGui/Renderer.h"
+#include "Compatibility.h"
 #include "Papyrus.h"
 #include "Subtitles.h"
 
@@ -10,14 +10,14 @@ void OnInit(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kPostLoad:
 		{
 			logger::info("{:*^30}", "POST LOAD");
-			Compatibility::DisplayTweaks::LoadSettings();
+			ModAPIHandler::GetSingleton()->LoadModSettings();
 			Hooks::Install();
 		}
 		break;
 	case SKSE::MessagingInterface::kPostPostLoad:
 		{
 			logger::info("{:*^30}", "POST POST LOAD");
-			Compatibility::BTPS::GetAPI();
+			ModAPIHandler::GetSingleton()->LoadAPIs();
 		}
 		break;
 	case SKSE::MessagingInterface::kDataLoaded:

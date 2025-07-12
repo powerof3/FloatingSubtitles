@@ -4,7 +4,7 @@
 #include "ImGui/FontStyles.h"
 #include "ImGui/Util.h"
 #include "RayCaster.h"
-#include "Settings.h"
+#include "SettingLoader.h"
 
 namespace Subtitles
 {
@@ -88,7 +88,7 @@ namespace Subtitles
 
 	void Manager::LoadMCMSettings()
 	{
-		Settings::GetSingleton()->SerializeMCM([this](auto& ini) {
+		SettingLoader::GetSingleton()->Load(FileType::kMCM, [this](auto& ini) {
 			LoadMCMSettings(ini);
 		});
 
@@ -105,7 +105,7 @@ namespace Subtitles
 
 		maxDistanceStart = static_cast<float>(a_ini.GetDoubleValue("Settings", "fMaxDistanceFromSpeaker", maxDistanceStart));
 
-		subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * Compatibility::DisplayTweaks::GetResolutionScale();
+		subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * ModAPIHandler::GetSingleton()->GetResolutionScale();
 
 		doRayCastChecks = a_ini.GetBoolValue("Settings", "bEnableRaycastChecks", doRayCastChecks);
 
@@ -165,22 +165,15 @@ namespace Subtitles
 
 	RE::NiPoint3 Manager::CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const
 	{
-		RE::NiPoint3 pos{};
-
 		const auto ref = a_subInfo.speaker.get();
 		const auto height = ref->GetHeight();
-		const auto crosshairTarget = a_subInfo.isFlagSet(SubtitleFlag::kCrosshairRef);
 
-		float offset{};
+		auto pos = GetSubtitleAnchorPosImpl(ref, height);
+		auto offset = current.subtitleHeadOffset;
 
-		if (crosshairTarget) {
-			pos = Compatibility::BTPS::GetWidgetPos();
+		if (auto overridePosZ = current.useBTPSWidgetPosition ? ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref) : std::optional<float>()) {
+			pos.z = *overridePosZ;
 			offset = current.subtitleHeadOffset * 0.75f;
-		}
-
-		if (pos == RE::NiPoint3::Zero()) {
-			pos = GetSubtitleAnchorPosImpl(ref, height);
-			offset = current.subtitleHeadOffset;
 		}
 
 		pos.z += offset * (height / 128.0f);
@@ -252,10 +245,6 @@ namespace Subtitles
 			if (auto ref = subtitleInfo.speaker.get()) {
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subtitleInfo.speaker);
 				subtitleInfo.setFlag(SubtitleFlag::kTypeDialogue, isDialogueSpeaker);
-
-				if (current.useBTPSWidgetPosition) {
-					subtitleInfo.setFlag(SubtitleFlag::kCrosshairRef, RE::IsCrosshairRef(ref));
-				}
 
 				if (auto actor = ref->As<RE::Actor>()) {
 					if (!current.doRayCastChecks ||

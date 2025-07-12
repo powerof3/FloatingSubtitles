@@ -1,5 +1,6 @@
 set(headers ${headers}
 	src/API/BTPS_API_decl.h
+	src/API/TrueHUDAPI.h
 	src/Compatibility.h
 	src/Hooks.h
 	src/ImGui/FontStyles.h
@@ -10,6 +11,6 @@ set(headers ${headers}
 	src/Papyrus.h
 	src/RE.h
 	src/RayCaster.h
-	src/Settings.h
+	src/SettingLoader.h
 	src/Subtitles.h
 )

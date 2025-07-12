@@ -9,7 +9,7 @@ set(sources ${sources}
 	src/Papyrus.cpp
 	src/RE.cpp
 	src/RayCaster.cpp
-	src/Settings.cpp
+	src/SettingLoader.cpp
 	src/Subtitles.cpp
 	src/main.cpp
 )

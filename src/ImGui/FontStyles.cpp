@@ -1,7 +1,7 @@
 #include "FontStyles.h"
 
 #include "Compatibility.h"
-#include "Settings.h"
+#include "SettingLoader.h"
 
 namespace ImGui
 {
@@ -10,7 +10,7 @@ namespace ImGui
 		name = a_ini.GetValue(a_section, "sFont", "");
 		name = R"(Data/Interface/ImGuiIcons/Fonts/)" + name;
 
-		const auto resolutionScale = Compatibility::DisplayTweaks::GetResolutionScale();
+		const auto resolutionScale = ModAPIHandler::GetSingleton()->GetResolutionScale();
 		size = std::roundf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
 
 		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", -1.5));
@@ -61,7 +61,7 @@ namespace ImGui
 	void FontStyles::LoadFontStyles()
 	{
 		// load style
-		Settings::GetSingleton()->SerializeStyles([&](auto& ini) { LoadStyleSettings(ini); });
+		SettingLoader::GetSingleton()->Load(FileType::kStyles, [&](auto& ini) { LoadStyleSettings(ini); });
 
 		ImGuiStyle style;
 		auto&      colors = style.Colors;
@@ -69,12 +69,12 @@ namespace ImGui
 		colors[ImGuiCol_Text] = user.text;
 		user.shadowOffset = ImVec2(user.shadowOffsetVar, user.shadowOffsetVar);
 
-		style.ScaleAllSizes(Compatibility::DisplayTweaks::GetResolutionScale());
+		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
 
 		GetStyle() = style;
 
 		// load fonts
-		Settings::GetSingleton()->SerializeFonts([&](auto& ini) {
+		SettingLoader::GetSingleton()->Load(FileType::kFonts, [&](auto& ini) {
 			primaryFont.LoadFontSettings(ini, "PrimaryFont");
 			secondaryFont.LoadFontSettings(ini, "SecondaryFont");
 		});

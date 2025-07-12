@@ -1,56 +1,124 @@
 #include "Compatibility.h"
 
-#include "Settings.h"
+#include "RE.h"
+#include "SettingLoader.h"
 
-namespace Compatibility
+float ModAPIHandler::DisplayTweaks::GetResolutionScale() const
 {
+	return borderlessUpscale ?
+	           resolutionScale :
+	           RE::BSGraphics::Renderer::GetScreenSize().height / 1080.0f;
+}
 
-	float DisplayTweaks::GetResolutionScale()
-	{
-		return borderlessUpscale ?
-		           resolutionScale :
-		           RE::BSGraphics::Renderer::GetScreenSize().height / 1080.0f;
-	}
+void ModAPIHandler::DisplayTweaks::LoadSettings()
+{
+	SettingLoader::GetSingleton()->Load(FileType::kDisplayTweaks, [this](auto& ini) {
+		resolutionScale = static_cast<float>(ini.GetDoubleValue("Render", "ResolutionScale", resolutionScale));
+		borderlessUpscale = static_cast<float>(ini.GetBoolValue("Render", "BorderlessUpscale", borderlessUpscale));
+	});
+}
 
-	void DisplayTweaks::LoadSettings()
-	{
-		Settings::GetSingleton()->SerializeDisplayTweaks([](auto& ini) {
-			resolutionScale = static_cast<float>(ini.GetDoubleValue("Render", "ResolutionScale", resolutionScale));
-			borderlessUpscale = static_cast<float>(ini.GetBoolValue("Render", "BorderlessUpscale", borderlessUpscale));
+void ModAPIHandler::BTPS::GetAPI()
+{
+	api = BTPS_API_decl::RequestPluginAPI_V0();
+	if (api) {
+		logger::info("Retrieving BTPS API...");
+		SettingLoader::GetSingleton()->Load(FileType::kBTPS, [this](auto& ini) {
+			if (api == nullptr || validAPI) {
+				return;
+			}
+			auto widgetPos = ini.GetDoubleValue("Widgets", "fWidgetZOffsetAdditionalNPC", std::numeric_limits<double>::max());  // only available in updated BTPS with new API functions
+			if (widgetPos == std::numeric_limits<double>::max()) {
+				logger::warn("\tBTPS API is outdated!");
+				api = nullptr;
+			} else {
+				logger::info("\tBTPS API is up to date!");
+				validAPI = true;
+			}
 		});
+	} else {
+		logger::info("Unable to acquire BTPS API");
+	}
+}
+
+void ModAPIHandler::BTPS::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std::optional<float>& a_posZOut) const
+{
+	if (a_posZOut.has_value()) {
+		return;  // already set
 	}
 
-	void BTPS::GetAPI()
-	{
-		api = BTPS_API_decl::RequestPluginAPI_V0();
-		if (api) {
-			logger::info("Retrieving BTPS API...");
-			Settings::GetSingleton()->SerializeBTPS([](auto& ini) {
-				if (api == nullptr || validAPI) {
-					return;
-				}
-				auto widgetPos = ini.GetDoubleValue("Widgets", "fWidgetZOffsetAdditionalNPC", std::numeric_limits<double>::max());  // only available in updated BTPS with new API functions
-				if (widgetPos == std::numeric_limits<double>::max()) {
-					logger::warn("\tBTPS API is outdated!");
-					api = nullptr;
-				} else {
-					logger::info("\tBTPS API is up to date!");
-					validAPI = true;
-				}
-			});
-		} else {
-			logger::info("Unable to acquire BTPS API");
-		}
-	}
-
-	RE::NiPoint3 BTPS::GetWidgetPos()
-	{
+	if (api && api->GetWidget3DEnabled() && RE::IsCrosshairRef(a_ref)) {
 		double x = 0.0;
 		double y = 0.0;
 		double z = 0.0;
-		if (api && api->GetWidget3DEnabled()) {
-			api->GetSelectionWidgetPos3D(x, y, z);
-		}
-		return RE::NiPoint3{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) };
+		api->GetSelectionWidgetPos3D(x, y, z);
+		a_posZOut = static_cast<float>(z);
 	}
+}
+
+void ModAPIHandler::TrueHUD::GetAPI()
+{
+	logger::info("Retrieving TrueHUD API...");
+	api = reinterpret_cast<TRUEHUD_API::IVTrueHUD4*>(TRUEHUD_API::RequestPluginAPI());
+	if (api) {
+		logger::info("\tTrueHUD API is up to date!");
+		SettingLoader::GetSingleton()->Load(FileType::kTrueHUD, [this](auto& ini) {
+			infoBarAnchor = static_cast<WidgetAnchor>(ini.GetLongValue("ActorInfoBars", "uInfoBarAnchor", std::to_underlying(WidgetAnchor::kHead)));
+			infoBarOffsetZ = static_cast<float>(ini.GetDoubleValue("ActorInfoBars", "fInfoBarOffsetZ", 30.0));
+		});
+	} else {
+		logger::info("Unable to acquire TrueHUD API");
+	}
+}
+
+void ModAPIHandler::TrueHUD::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std::optional<float>& a_posZOut) const
+{
+	if (auto actor = a_ref->As<RE::Actor>()) {
+		if (api && api->HasInfoBar(actor->CreateRefHandle(), true)) {
+			switch (infoBarAnchor) {
+			case WidgetAnchor::kHead:
+				{
+					auto pos = actor->GetLookingAtLocation();
+					pos.z += infoBarOffsetZ;
+					a_posZOut = pos.z;
+				}
+				break;
+			case WidgetAnchor::kBody:
+				{
+					if (const auto torso = RE::GetTorsoNode(actor)) {
+						auto pos = torso->world.translate;
+						pos.z += infoBarOffsetZ;
+						a_posZOut = pos.z;
+					}
+				}
+				break;
+			default:
+				std::unreachable();
+			}
+		}
+	}
+}
+
+void ModAPIHandler::LoadModSettings()
+{
+	displayTweaks.LoadSettings();
+}
+
+void ModAPIHandler::LoadAPIs()
+{
+	btps.GetAPI();
+	trueHUD.GetAPI();
+}
+
+std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref) const
+{
+	std::optional<float> posZ;
+	trueHUD.GetWidgetPos(a_ref, posZ);
+	btps.GetWidgetPos(a_ref, posZ);
+	return posZ;
+}
+
+float ModAPIHandler::GetResolutionScale() const
+{
+	return displayTweaks.GetResolutionScale();
 }

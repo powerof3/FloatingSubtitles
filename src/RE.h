@@ -66,21 +66,22 @@ namespace RE
 		void setFlag(Flag a_flag, bool a_set);
 	};
 
-	bool            IsCrosshairRef(const RE::TESObjectREFRPtr& a_ref);
-	RE::NiAVObject* GetHeadNode(const RE::TESObjectREFRPtr& a_ref);
-	bool            HasLOSToTarget(RE::PlayerCharacter* a_player, RE::TESObjectREFR* a_target, bool& pickPerformed);
-	void            QueueDialogSubtitles(const char* a_text);
-	std::string     GetINISettingString(std::string_view a_setting);
-	bool            GetINIPrefsSettingBool(std::string_view a_setting);
-	bool            ShowGeneralSubsGame();
-	bool            ShowDialogueSubsGame();
+	bool        IsCrosshairRef(const TESObjectREFRPtr& a_ref);
+	NiAVObject* GetHeadNode(const TESObjectREFRPtr& a_ref);
+	NiAVObject* GetTorsoNode(const Actor* a_actor);
+	bool        HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed);
+	void        QueueDialogSubtitles(const char* a_text);
+	std::string GetINISettingString(std::string_view a_setting);
+	bool        GetINIPrefsSettingBool(std::string_view a_setting);
+	bool        ShowGeneralSubsGame();
+	bool        ShowDialogueSubsGame();
 
 	template <class... Args>
-	bool DispatchStaticCall(RE::BSFixedString a_class, RE::BSFixedString a_fnName, Args&&... a_args)
+	bool DispatchStaticCall(BSFixedString a_class, BSFixedString a_fnName, Args&&... a_args)
 	{
-		if (auto vm = RE::BSScript::Internal::VirtualMachine::GetSingleton()) {
-			RE::BSTSmartPointer<RE::BSScript::IStackCallbackFunctor> callback;
-			auto                                                     args = RE::MakeFunctionArguments(std::forward<Args>(a_args)...);
+		if (auto vm = BSScript::Internal::VirtualMachine::GetSingleton()) {
+			BSTSmartPointer<BSScript::IStackCallbackFunctor> callback;
+			auto                                             args = MakeFunctionArguments(std::forward<Args>(a_args)...);
 			return vm->DispatchStaticCall(a_class, a_fnName, args, callback);
 		}
 		return false;

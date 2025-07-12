@@ -1,24 +1,30 @@
 #pragma once
 
-class Settings
+enum class FileType
+{
+	kFonts,
+	kStyles,
+	kMCM,
+	kDisplayTweaks,
+	kBTPS,
+	kTrueHUD
+};
+
+class SettingLoader
 {
 public:
 	using INIFunc = std::function<void(CSimpleIniA&)>;
 
-	static Settings* GetSingleton()
+	static SettingLoader* GetSingleton()
 	{
 		return &instance;
 	}
 
-	void SerializeStyles(INIFunc a_func) const;
-	void SerializeFonts(INIFunc a_func) const;
-	void SerializeMCM(INIFunc a_func) const;
-	void SerializeBTPS(INIFunc a_func) const;
-	void SerializeDisplayTweaks(INIFunc a_func) const;
+	void Load(FileType type, INIFunc a_func, bool a_generate = false) const;
 
 private:
-	static void SerializeINI(const wchar_t* a_path, INIFunc a_func, bool a_generate = false);
-	static void SerializeINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, INIFunc a_func);
+	static void LoadINI(const wchar_t* a_path, INIFunc a_func, bool a_generate = false);
+	static void LoadINI(const wchar_t* a_defaultPath, const wchar_t* a_userPath, INIFunc a_func);
 
 	// members
 	const wchar_t* fontsPath{ L"Data/Interface/FloatingSubtitles/fonts.ini" };
@@ -33,7 +39,10 @@ private:
 	const wchar_t* defaultBTPSPath{ L"Data/MCM/Config/BetterThirdPersonSelection/settings.ini" };
 	const wchar_t* userBTPSPath{ L"Data/MCM/Settings/BetterThirdPersonSelection.ini" };
 
-	static Settings instance;
+	const wchar_t* defaultTrueHUDPath{ L"Data/MCM/Config/TrueHUD/settings.ini" };
+	const wchar_t* userTrueHUDPath{ L"Data/MCM/Settings/TrueHUD.ini" };
+
+	static SettingLoader instance;
 };
 
-inline constinit Settings Settings::instance;
+inline constinit SettingLoader SettingLoader::instance;

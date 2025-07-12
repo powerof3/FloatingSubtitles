@@ -44,15 +44,15 @@ namespace RE
 		}
 	}
 
-	bool IsCrosshairRef(const RE::TESObjectREFRPtr& a_ref)
+	bool IsCrosshairRef(const TESObjectREFRPtr& a_ref)
 	{
-		auto crosshairPick = RE::CrosshairPickData::GetSingleton();
+		auto crosshairPick = CrosshairPickData::GetSingleton();
 		return crosshairPick && crosshairPick->target.get() == a_ref;
 	}
 
-	RE::NiAVObject* GetHeadNode(const RE::TESObjectREFRPtr& a_ref)
+	NiAVObject* GetHeadNode(const TESObjectREFRPtr& a_ref)
 	{
-		if (auto actor = a_ref->As<RE::Actor>()) {
+		if (auto actor = a_ref->As<Actor>()) {
 			if (auto middle = actor->GetMiddleHighProcess()) {
 				return middle->headNode;
 			}
@@ -60,37 +60,45 @@ namespace RE
 		return nullptr;
 	}
 
-	bool HasLOSToTarget(RE::PlayerCharacter* a_player, RE::TESObjectREFR* a_target, bool& pickPerformed)
+	NiAVObject* GetTorsoNode(const Actor* a_actor)
 	{
-		using func_t = decltype(&RE::HasLOSToTarget);
+		if (auto middle = a_actor->GetMiddleHighProcess()) {
+			return middle->headNode;
+		}
+		return nullptr;
+	}
+
+	bool HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed)
+	{
+		using func_t = decltype(&HasLOSToTarget);
 		static REL::Relocation<func_t> func{ RELOCATION_ID(39444, 40520) };
 		return func(a_player, a_target, pickPerformed);
 	}
 
 	void QueueDialogSubtitles(const char* a_text)
 	{
-		using func_t = decltype(&RE::QueueDialogSubtitles);
+		using func_t = decltype(&QueueDialogSubtitles);
 		static REL::Relocation<func_t> func{ RELOCATION_ID(51916, 52854) };
 		return func(a_text);
 	}
 
 	std::string GetINISettingString(std::string_view a_setting)
 	{
-		return string::toupper(RE::INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetString());
+		return string::toupper(INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetString());
 	}
 
 	bool GetINIPrefsSettingBool(std::string_view a_setting)
 	{
-		return RE::INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting)->GetBool();
+		return INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting)->GetBool();
 	}
 
 	bool ShowGeneralSubsGame()
 	{
-		return RE::GetINIPrefsSettingBool("bGeneralSubtitles:Interface");
+		return GetINIPrefsSettingBool("bGeneralSubtitles:Interface");
 	}
 
 	bool ShowDialogueSubsGame()
 	{
-		return RE::GetINIPrefsSettingBool("bDialogueSubtitles:Interface");
+		return GetINIPrefsSettingBool("bDialogueSubtitles:Interface");
 	}
 }
