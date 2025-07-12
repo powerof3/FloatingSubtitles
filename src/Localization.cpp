@@ -1,7 +1,5 @@
 #include "Localization.h"
 
-#include "Compatibility.h"
-#include "ImGui/FontStyles.h"
 #include "RE.h"
 
 namespace Subtitles
@@ -77,7 +75,6 @@ namespace Subtitles
 		if (language == Language::kNative) {
 			language = gameLanguage;
 			a_ini.SetLongValue("Settings", langKey.c_str(), std::to_underlying(language));
-			;
 		}
 
 		std::string maxCharKey = std::string("iMaxCharactersPerLine").append(a_section);
@@ -187,8 +184,7 @@ namespace Subtitles
 		};
 
 		for (auto& [subtitle, ids] : a_multiSubToID) {
-			auto [it, result] = subtitleToID.try_emplace(subtitle, pick_best_id(ids));
-			if (result) {
+			if (auto [it, result] = subtitleToID.try_emplace(subtitle, pick_best_id(ids)); result) {
 				idToSubtitle.try_emplace(it->second, pick_best_subtitle(it->second));
 			}
 		}
@@ -238,12 +234,12 @@ namespace Subtitles
 		return { subtitleIt->second, maxCharsPerLine };
 	}
 
-	LocalizedSubtitle LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle)
+	LocalizedSubtitle LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle) const
 	{
 		return ResolveSubtitle(a_localSubtitle, primaryLanguage);
 	}
 
-	LocalizedSubtitle LocalizedSubtitles::GetSecondarySubtitle(const char* a_localSubtitle)
+	LocalizedSubtitle LocalizedSubtitles::GetSecondarySubtitle(const char* a_localSubtitle) const
 	{
 		return ResolveSubtitle(a_localSubtitle, secondaryLanguage);
 	}

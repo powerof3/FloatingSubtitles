@@ -1,7 +1,5 @@
 #include "Hooks.h"
 
-#include "RE.h"
-#include "RayCaster.h"
 #include "Subtitles.h"
 
 namespace Hooks

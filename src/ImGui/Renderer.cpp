@@ -26,7 +26,7 @@ namespace ImGui::Renderer
 			func();
 
 			if (const auto renderer = RE::BSGraphics::Renderer::GetSingleton()) {
-				const auto swapChain = (IDXGISwapChain*)renderer->data.renderWindows[0].swapChain;
+				const auto swapChain = reinterpret_cast<IDXGISwapChain*>(renderer->data.renderWindows[0].swapChain);
 				if (!swapChain) {
 					logger::error("couldn't find swapChain");
 					return;
@@ -38,8 +38,8 @@ namespace ImGui::Renderer
 					return;
 				}
 
-				const auto device = (ID3D11Device*)renderer->data.forwarder;
-				const auto context = (ID3D11DeviceContext*)renderer->data.context;
+				const auto device = reinterpret_cast<ID3D11Device*>(renderer->data.forwarder);
+				const auto context = reinterpret_cast<ID3D11DeviceContext*>(renderer->data.context);
 
 				logger::info("Initializing ImGui..."sv);
 
@@ -93,8 +93,8 @@ namespace ImGui::Renderer
 				static const auto screenSize = RE::BSGraphics::Renderer::GetScreenSize();
 
 				auto& io = ImGui::GetIO();
-				io.DisplaySize.x = (float)screenSize.width;
-				io.DisplaySize.y = (float)screenSize.height;
+				io.DisplaySize.x = static_cast<float>(screenSize.width);
+				io.DisplaySize.y = static_cast<float>(screenSize.height);
 			}
 			ImGui::NewFrame();
 			{

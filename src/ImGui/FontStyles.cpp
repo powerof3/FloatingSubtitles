@@ -42,9 +42,9 @@ namespace ImGui
 	std::tie(user.a_value, a_value##_hex) = ToStyle<decltype(user.a_value)>(a_ini.GetValue(a_section, a_key, ToString(def.a_value, true).c_str())); \
 	a_ini.SetValue(a_section, a_key, ToString(user.a_value, a_value##_hex).c_str());
 
-		GET_VALUE(text, "Text", "rTextColor");
-		GET_VALUE(shadowText, "Text", "rTextShadowColor");
-		GET_VALUE(shadowOffsetVar, "Text", "fTextShadowOffset");
+		GET_VALUE(text, "Text", "rTextColor")
+		GET_VALUE(shadowText, "Text", "rTextShadowColor")
+		GET_VALUE(shadowOffsetVar, "Text", "fTextShadowOffset")
 
 #undef GET_VALUE
 	}

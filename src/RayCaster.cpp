@@ -1,7 +1,6 @@
 #include "RayCaster.h"
 
 #include "ImGui/Util.h"
-#include "RE.h"
 
 void StartPoint::Init()
 {
@@ -41,7 +40,7 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayC
 		return;
 	}
 
-	auto rootCollidable = static_cast<const RE::hkpCollidable*>(body);
+	const auto rootCollidable = static_cast<const RE::hkpCollidable*>(body);
 	auto rootColFilter = rootCollidable->broadPhaseHandle.collisionFilterInfo;
 
 	switch (rootColFilter.GetCollisionLayer()) {

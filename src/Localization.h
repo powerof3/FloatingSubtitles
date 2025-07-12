@@ -4,9 +4,8 @@ namespace Subtitles
 {
 	enum class Language
 	{
-		kNative = -1,
-
-		kChinese = 0,
+		kNative = static_cast<std::underlying_type_t<Language>>(-1),
+		kChinese,
 		kCzech,
 		kEnglish,
 		kFrench,
@@ -28,7 +27,7 @@ namespace Subtitles
 	struct LanguageSetting
 	{
 		bool operator==(const LanguageSetting& rhs) const { return language == rhs.language; }
-		bool operator==(Language rhs) const { return language == rhs; }
+		bool operator==(const Language rhs) const { return language == rhs; }
 
 		bool LoadMCMSettings(CSimpleIniA& a_ini, const char* a_section, Language gameLanguage);
 
@@ -55,8 +54,8 @@ namespace Subtitles
 		bool LoadMCMSettings(CSimpleIniA& a_ini);
 		void PostMCMSettingsLoad();
 
-		LocalizedSubtitle GetPrimarySubtitle(const char* a_localSubtitle);
-		LocalizedSubtitle GetSecondarySubtitle(const char* a_localSubtitle);
+		LocalizedSubtitle GetPrimarySubtitle(const char* a_localSubtitle) const;
+		LocalizedSubtitle GetSecondarySubtitle(const char* a_localSubtitle) const;
 
 	private:
 		using SubtitleID = std::uint64_t;  // hashed id (string id + mod index)
@@ -74,8 +73,8 @@ namespace Subtitles
 
 		// members
 		Language        gameLanguage{ Language::kEnglish };
-		LanguageSetting primaryLanguage;
-		LanguageSetting secondaryLanguage;
+		LanguageSetting primaryLanguage{};
+		LanguageSetting secondaryLanguage{};
 		SubtitleToIDMap subtitleToID;
 		IDToSubtitleMap idToSubtitle;
 	};

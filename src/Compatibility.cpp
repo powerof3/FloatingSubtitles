@@ -1,6 +1,5 @@
 #include "Compatibility.h"
 
-#include "RE.h"
 #include "Settings.h"
 
 namespace Compatibility
@@ -23,7 +22,7 @@ namespace Compatibility
 
 	void BTPS::GetAPI()
 	{
-		api = reinterpret_cast<BTPS_API_decl::API_V0*>(BTPS_API_decl::RequestPluginAPI_V0());
+		api = BTPS_API_decl::RequestPluginAPI_V0();
 		if (api) {
 			logger::info("Retrieving BTPS API...");
 			Settings::GetSingleton()->SerializeBTPS([](auto& ini) {
@@ -52,6 +51,6 @@ namespace Compatibility
 		if (api && api->GetWidget3DEnabled()) {
 			api->GetSelectionWidgetPos3D(x, y, z);
 		}
-		return RE::NiPoint3{ (float)x, (float)y, (float)z };
+		return RE::NiPoint3{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z) };
 	}
 }

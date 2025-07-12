@@ -11,8 +11,8 @@ struct StartPoint
 class RayCollector : public RE::hkpClosestRayHitCollector
 {
 public:
-	RayCollector(){};
-	RayCollector(RE::Actor* actor, RE::COL_LAYER a_layer);
+	RayCollector(){}
+	RayCollector(RE::Actor* a_actor, RE::COL_LAYER a_layer);
 
 	void AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayCastCollectorOutput& a_hitInfo) override;  // 00
 	~RayCollector() override = default;                                                                         // 01

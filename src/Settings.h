@@ -8,7 +8,7 @@ public:
 	static Settings* GetSingleton()
 	{
 		return &instance;
-	};
+	}
 
 	void SerializeStyles(INIFunc a_func) const;
 	void SerializeFonts(INIFunc a_func) const;

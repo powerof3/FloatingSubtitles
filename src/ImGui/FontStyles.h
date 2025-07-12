@@ -49,8 +49,8 @@ namespace ImGui
 		Style def;
 		Style user;
 
-		Font primaryFont;
-		Font secondaryFont;
+		Font primaryFont{};
+		Font secondaryFont{};
 
 		static FontStyles instance;
 	};

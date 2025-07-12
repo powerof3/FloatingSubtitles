@@ -2,15 +2,14 @@
 
 #include "Compatibility.h"
 #include "ImGui/FontStyles.h"
-#include "ImGui/Renderer.h"
 #include "ImGui/Util.h"
 #include "RayCaster.h"
 #include "Settings.h"
 
 namespace Subtitles
 {
-	Subtitle::Subtitle(const LocalizedSubtitle& a_primarySubtitle) :
-		lines(WrapText(a_primarySubtitle.subtitle, a_primarySubtitle.maxCharsPerLine))
+	Subtitle::Subtitle(const LocalizedSubtitle& a_subtitle) :
+		lines(WrapText(a_subtitle.subtitle, a_subtitle.maxCharsPerLine))
 	{}
 
 	std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uint32_t maxWidth)
@@ -43,10 +42,10 @@ namespace Subtitles
 	{
 		auto* drawList = ImGui::GetForegroundDrawList();
 
-		for (const auto& [line, size] : lines) {
+		for (const auto& [line, textSize] : lines) {
 			a_posY -= a_lineHeight;
 
-			const ImVec2 textPos(a_posX - size.x * 0.5f, a_posY);
+			const ImVec2 textPos(a_posX - (textSize.x * 0.5f), a_posY);
 			drawList->AddText(textPos + a_params.shadowOffset, a_params.shadowColor, line.c_str());
 			drawList->AddText(textPos, a_params.textColor, line.c_str());
 		}
@@ -77,7 +76,7 @@ namespace Subtitles
 		if (!secondary.lines.empty()) {
 			posY -= lineHeight * spacing;
 			secondary.DrawSubtitle(screenPos.x, posY, styleParams, lineHeight);
-		};
+		}
 	}
 
 	void Manager::OnDataLoaded()
@@ -153,7 +152,7 @@ namespace Subtitles
 
 	bool Manager::ShowDialogueSubtitles() const { return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles; }
 
-	RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height) const
+	RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height)
 	{
 		RE::NiPoint3 pos = a_ref->GetPosition();
 		if (const auto headNode = RE::GetHeadNode(a_ref)) {
@@ -189,7 +188,7 @@ namespace Subtitles
 		return pos;
 	}
 
-	DualSubtitle Manager::CreateDualSubtitles(const char* subtitle)
+	DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
 	{
 		auto primarySub = localizedSubs.GetPrimarySubtitle(subtitle);
 		if (current.showDualSubs) {
@@ -278,17 +277,8 @@ namespace Subtitles
 		const bool showGeneral = ShowGeneralSubtitles();
 		const bool showDialogue = ShowDialogueSubtitles();
 
-		if (!showGeneral && !showDialogue) {
+		if (!showGeneral && !showDialogue || !IsVisible()) {
 			return;
-		}
-
-		if (!IsVisible()) {
-			return;
-		}
-
-		StartPoint rayCastStart;
-		if (current.doRayCastChecks) {
-			rayCastStart.Init();
 		}
 
 		ImGui::SetNextWindowPos(ImGui::GetNativeViewportPos());

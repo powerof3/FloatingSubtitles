@@ -1,9 +1,7 @@
 #include "Compatibility.h"
 #include "Hooks.h"
 #include "ImGui/Renderer.h"
-#include "Localization.h"
 #include "Papyrus.h"
-#include "Settings.h"
 #include "Subtitles.h"
 
 void OnInit(SKSE::MessagingInterface::Message* a_msg)

@@ -1,8 +1,5 @@
 #include "Util.h"
 
-#include "FontStyles.h"
-#include "Renderer.h"
-
 namespace ImGui
 {
 	float WorldToScreenLoc(const RE::NiPoint3& worldLocIn, ImVec2& screenLocOut)

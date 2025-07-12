@@ -14,7 +14,7 @@ namespace Subtitles
 	{
 		ImVec2 pos{};
 		float  alpha{ 1.0f };
-		float  spacing;
+		float  spacing{ 0.5f };
 	};
 
 	struct Subtitle
@@ -39,7 +39,7 @@ namespace Subtitles
 	struct DualSubtitle
 	{
 		DualSubtitle() = default;
-		DualSubtitle(const LocalizedSubtitle& a_subtitle);
+		DualSubtitle(const LocalizedSubtitle& a_primarySubtitle);
 		DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const LocalizedSubtitle& a_secondarySubtitle);
 
 		void DrawDualSubtitle(const ScreenParams& a_screenParams) const;
@@ -93,10 +93,10 @@ namespace Subtitles
 
 		bool IsVisible() const;
 
-		RE::NiPoint3 CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
-		RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height) const;
+		RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
+		static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
 
-		DualSubtitle        CreateDualSubtitles(const char* subtitle);
+		DualSubtitle        CreateDualSubtitles(const char* subtitle) const;
 		const DualSubtitle& GetProcessedSubtitles(const RE::BSString& subtitle);
 		void                RebuildProcessedSubtitles();
 
