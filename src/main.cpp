@@ -1,6 +1,6 @@
+#include "Compatibility.h"
 #include "Hooks.h"
 #include "ImGui/Renderer.h"
-#include "Compatibility.h"
 #include "Papyrus.h"
 #include "Subtitles.h"
 

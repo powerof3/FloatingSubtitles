@@ -142,10 +142,10 @@ namespace TRUEHUD_API
 		}
 
 		RE::GPtr<RE::GFxMovieView> _view;
-		RE::GFxValue _object;
-		uint32_t _widgetID;
+		RE::GFxValue               _object;
+		uint32_t                   _widgetID;
 
-		mutable Lock _lock;
+		mutable Lock           _lock;
 		std::queue<WidgetTask> _taskQueue;
 
 		WidgetState _widgetState = WidgetState::kHidden;
@@ -393,7 +393,7 @@ namespace TRUEHUD_API
 	/// <returns>The pointer to the API singleton, or nullptr if request failed</returns>
 	[[nodiscard]] inline void* RequestPluginAPI(const InterfaceVersion a_interfaceVersion = InterfaceVersion::V4)
 	{
-		auto pluginHandle = GetModuleHandleA("TrueHUD.dll");
+		auto              pluginHandle = GetModuleHandleA("TrueHUD.dll");
 		_RequestPluginAPI requestAPIFunction = (_RequestPluginAPI)GetProcAddress(pluginHandle, "RequestPluginAPI");
 		if (requestAPIFunction) {
 			return requestAPIFunction(a_interfaceVersion);
