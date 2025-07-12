@@ -117,7 +117,7 @@ std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_
 		trueHUD.GetWidgetPos(a_ref, posZ);
 	}
 	if (a_BTPS) {
-		btps.GetWidgetPos(a_ref, posZ);		
+		btps.GetWidgetPos(a_ref, posZ);
 	}
 	return posZ;
 }
