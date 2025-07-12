@@ -77,6 +77,7 @@ namespace Subtitles
 			bool  showDialogueSubtitles{ false };
 			bool  showDualSubs{ false };
 			bool  useBTPSWidgetPosition{ true };
+			bool  useTrueHUDWidgetPosition{ true };
 			bool  doRayCastChecks{ true };
 			bool  fadeSubtitles{ true };
 			float fadeSubtitleAlpha{ 0.35f };

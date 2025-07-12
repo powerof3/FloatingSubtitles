@@ -48,7 +48,7 @@ public:
 	void LoadModSettings();
 	void LoadAPIs();
 
-	std::optional<float> GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref) const;
+	std::optional<float> GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const;
 	float                GetResolutionScale() const;
 
 	DisplayTweaks displayTweaks;

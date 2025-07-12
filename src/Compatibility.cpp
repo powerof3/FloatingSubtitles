@@ -110,11 +110,15 @@ void ModAPIHandler::LoadAPIs()
 	trueHUD.GetAPI();
 }
 
-std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref) const
+std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const
 {
 	std::optional<float> posZ;
-	trueHUD.GetWidgetPos(a_ref, posZ);
-	btps.GetWidgetPos(a_ref, posZ);
+	if (a_trueHUD) {
+		trueHUD.GetWidgetPos(a_ref, posZ);
+	}
+	if (a_BTPS) {
+		btps.GetWidgetPos(a_ref, posZ);		
+	}
 	return posZ;
 }
 

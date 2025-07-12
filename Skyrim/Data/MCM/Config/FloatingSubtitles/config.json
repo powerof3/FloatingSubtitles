@@ -49,7 +49,15 @@
           "text": "$FSUB_UseBTPSWidgetPosition_Text",
           "type": "toggle",
           "help": "$FSUB_UseBTPSWidgetPosition_Help",
-          "groupCondition": 1,
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bUseTrueHUDWidgetPosition:Settings",
+          "text": "$FSUB_UseTrueHUDWidgetPosition_Text",
+          "type": "toggle",
+          "help": "$FSUB_UseTrueHUDWidgetPosition_Help",
           "valueOptions": {
             "sourceType": "ModSettingBool"
           }

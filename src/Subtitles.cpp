@@ -116,6 +116,7 @@ namespace Subtitles
 		subtitleSpacing = static_cast<float>(a_ini.GetDoubleValue("Settings", "fDualSubtitleSpacing", subtitleSpacing));
 
 		useBTPSWidgetPosition = a_ini.GetBoolValue("Settings", "bUseBTPSWidgetPosition", useBTPSWidgetPosition);
+		useTrueHUDWidgetPosition = a_ini.GetBoolValue("Settings", "bUseTrueHUDWidgetPosition", useTrueHUDWidgetPosition);
 	}
 
 	void Manager::LoadMCMSettings(CSimpleIniA& a_ini)
@@ -171,7 +172,7 @@ namespace Subtitles
 		auto pos = GetSubtitleAnchorPosImpl(ref, height);
 		auto offset = current.subtitleHeadOffset;
 
-		if (auto overridePosZ = current.useBTPSWidgetPosition ? ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref) : std::optional<float>()) {
+		if (auto overridePosZ = ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref, current.useBTPSWidgetPosition, current.useTrueHUDWidgetPosition)) {
 			pos.z = *overridePosZ;
 			offset = current.subtitleHeadOffset * 0.75f;
 		}
