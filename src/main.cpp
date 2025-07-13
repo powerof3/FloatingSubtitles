@@ -1,8 +1,8 @@
 #include "Compatibility.h"
 #include "Hooks.h"
 #include "ImGui/Renderer.h"
+#include "Manager.h"
 #include "Papyrus.h"
-#include "Subtitles.h"
 
 void OnInit(SKSE::MessagingInterface::Message* a_msg)
 {
@@ -23,7 +23,7 @@ void OnInit(SKSE::MessagingInterface::Message* a_msg)
 	case SKSE::MessagingInterface::kDataLoaded:
 		{
 			logger::info("{:*^30}", "DATA LOADED");
-			Subtitles::Manager::GetSingleton()->OnDataLoaded();
+			Manager::GetSingleton()->OnDataLoaded();
 		}
 		break;
 	default:

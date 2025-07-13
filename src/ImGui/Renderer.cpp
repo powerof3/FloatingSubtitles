@@ -1,7 +1,7 @@
 #include "Renderer.h"
 
 #include "ImGui/FontStyles.h"
-#include "Subtitles.h"
+#include "Manager.h"
 
 namespace ImGui::Renderer
 {
@@ -101,7 +101,7 @@ namespace ImGui::Renderer
 				// disable windowing
 				GImGui->NavWindowingTarget = nullptr;
 
-				Subtitles::Manager::GetSingleton()->Draw();
+				Manager::GetSingleton()->Draw();
 			}
 			ImGui::EndFrame();
 			ImGui::Render();

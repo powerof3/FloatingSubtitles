@@ -56,8 +56,8 @@ namespace RE
 		{
 			kNone = 0,
 			kObscured = 1 << 0,
-			kTypeDialogue = 1 << 1,
-			kCrosshairRef = 1 << 2,
+			kDialogueSubtitle = 1 << 1,
+			kTalkingActivator = 1 << 2,
 		};
 
 		std::uint8_t& flagsRaw() { return pad1D; }

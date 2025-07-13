@@ -5,6 +5,7 @@ set(sources ${sources}
 	src/ImGui/Renderer.cpp
 	src/ImGui/Util.cpp
 	src/Localization.cpp
+	src/Manager.cpp
 	src/PCH.cpp
 	src/Papyrus.cpp
 	src/RE.cpp

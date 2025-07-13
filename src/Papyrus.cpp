@@ -1,12 +1,12 @@
 #include "Papyrus.h"
 
-#include "Subtitles.h"
+#include "Manager.h"
 
 namespace Papyrus
 {
 	void OnConfigClose(RE::TESQuest*)
 	{
-		Subtitles::Manager::GetSingleton()->LoadMCMSettings();
+		Manager::GetSingleton()->LoadMCMSettings();
 	}
 
 	bool Register(RE::BSScript::IVirtualMachine* a_vm)

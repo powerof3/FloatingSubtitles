@@ -7,6 +7,7 @@ set(headers ${headers}
 	src/ImGui/Renderer.h
 	src/ImGui/Util.h
 	src/Localization.h
+	src/Manager.h
 	src/PCH.h
 	src/Papyrus.h
 	src/RE.h

@@ -1,6 +1,6 @@
 #include "Hooks.h"
 
-#include "Subtitles.h"
+#include "Manager.h"
 
 namespace Hooks
 {
@@ -11,7 +11,7 @@ namespace Hooks
 			func(a_manager, ref, subtitle, alwaysDisplay);
 
 			if (!string::is_empty(subtitle) && !string::is_only_space(subtitle)) {
-				Subtitles::Manager::GetSingleton()->AddSubtitle(a_manager, subtitle);
+				Manager::GetSingleton()->AddSubtitle(a_manager, subtitle);
 			}
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
@@ -23,7 +23,7 @@ namespace Hooks
 		{
 			func(a_manager);
 
-			Subtitles::Manager::GetSingleton()->UpdateSubtitles(a_manager);
+			Manager::GetSingleton()->UpdateSubtitles(a_manager);
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
 	};
@@ -36,7 +36,7 @@ namespace Hooks
 				switch (hudData->type.get()) {
 				case RE::HUD_MESSAGE_TYPE::kShowSubtitle:
 					{
-						if (Subtitles::Manager::GetSingleton()->ShowGeneralSubtitles()) {
+						if (Manager::GetSingleton()->ShowGeneralSubtitles()) {
 							return RE::UI_MESSAGE_RESULTS::kIgnore;
 						}
 					}
@@ -51,7 +51,7 @@ namespace Hooks
 							"JournalMode"sv
 						};
 						if (std::ranges::any_of(badModes, [&](const auto& mode) { return string::iequals(hudData->text, mode); })) {
-							Subtitles::Manager::GetSingleton()->SetVisible(!hudData->show);
+							Manager::GetSingleton()->SetVisible(!hudData->show);
 						}
 					}
 					break;
@@ -73,7 +73,7 @@ namespace Hooks
 		{
 			if (a_message.type == RE::UI_MESSAGE_TYPE::kUpdate) {
 				if (auto dialogueMessageData = static_cast<RE::BSUIMessageData*>(a_message.data)) {
-					if (dialogueMessageData->fixedStr == RE::InterfaceStrings::GetSingleton()->showText && Subtitles::Manager::GetSingleton()->ShowDialogueSubtitles()) {
+					if (dialogueMessageData->fixedStr == RE::InterfaceStrings::GetSingleton()->showText && Manager::GetSingleton()->ShowDialogueSubtitles()) {
 						return RE::UI_MESSAGE_RESULTS::kIgnore;
 					}
 				}
