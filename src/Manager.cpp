@@ -1,7 +1,6 @@
 #include "Manager.h"
 
 #include "Compatibility.h"
-#include "ImGui/FontStyles.h"
 #include "ImGui/Util.h"
 #include "RayCaster.h"
 #include "SettingLoader.h"
