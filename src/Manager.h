@@ -57,8 +57,8 @@ private:
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
 	static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
 
-	DualSubtitle        CreateDualSubtitles(const char* subtitle) const;
-	void                RebuildProcessedSubtitles();
+	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
+	void         RebuildProcessedSubtitles();
 
 	// members
 	mutable RWLock                     subtitleLock;
