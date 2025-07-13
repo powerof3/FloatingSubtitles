@@ -76,9 +76,49 @@ void Manager::SetVisible(bool a_visible)
 	visible = a_visible;
 }
 
-bool Manager::ShowGeneralSubtitles() const { return RE::ShowGeneralSubsGame() && current.showGeneralSubtitles; }
+void Manager::AddObjectTag(RE::BSString& a_text)
+{
+	a_text = std::format("{}{}", a_text.c_str(), objectTag);
+}
 
-bool Manager::ShowDialogueSubtitles() const { return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles; }
+bool Manager::HasObjectTag(RE::BSString& a_text)
+{
+	std::string text = a_text.c_str();
+	if (text.ends_with(objectTag)) {
+		text.erase(text.length() - objectTag.length());
+		a_text = text;
+		return true;
+	}
+	return false;
+}
+
+bool Manager::HandlesGeneralSubtitles(RE::BSString& a_text) const
+{
+	if (HasObjectTag(a_text)) {
+		return false;
+	}
+
+	return ShowGeneralSubtitles();
+}
+
+bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
+{
+	if (a_text && HasObjectTag(*a_text)) {
+		return false;
+	}
+
+	return ShowDialogueSubtitles();
+}
+
+bool Manager::ShowGeneralSubtitles() const
+{
+	return RE::ShowGeneralSubsGame() && current.showGeneralSubtitles;
+}
+
+bool Manager::ShowDialogueSubtitles() const
+{
+	return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles;
+}
 
 RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height)
 {
@@ -136,6 +176,9 @@ void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle
 			if (const auto ref = subInfo.speaker.get()) {
 				bool talkingActivator = !ref->IsActor();
 				subInfo.setFlag(SubtitleFlag::kTalkingActivator, talkingActivator);
+				if (talkingActivator) {
+					AddObjectTag(subInfo.subtitle);
+				}
 			}
 		}
 	}

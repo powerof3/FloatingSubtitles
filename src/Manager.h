@@ -18,8 +18,8 @@ public:
 
 	void SetVisible(bool a_visible);
 
-	bool ShowGeneralSubtitles() const;
-	bool ShowDialogueSubtitles() const;
+	bool HandlesGeneralSubtitles(RE::BSString& a_text) const;
+	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
 
 private:
 	struct MCMSettings
@@ -46,6 +46,12 @@ private:
 
 	void LoadMCMSettings(CSimpleIniA& a_ini);
 
+	bool ShowGeneralSubtitles() const;
+	bool ShowDialogueSubtitles() const;
+
+	static void AddObjectTag(RE::BSString& a_text);
+	static bool HasObjectTag(RE::BSString& a_text);
+
 	bool IsVisible() const;
 
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
@@ -64,4 +70,6 @@ private:
 	float                              maxDistanceEndSq{ 4624220.16f };
 	bool                               visible{ true };
 	LocalizedSubtitles                 localizedSubs;
+
+	static constexpr std::string_view objectTag{ "[REF]" };
 };
