@@ -21,7 +21,7 @@ namespace Hooks
 		{
 			func(a_manager);
 
-			Manager::GetSingleton()->UpdateSubtitles(a_manager);
+			Manager::GetSingleton()->UpdateSubtitleInfo(a_manager);
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
 	};

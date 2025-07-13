@@ -39,7 +39,7 @@ namespace ImGui
 		ImVec2 screenPos;
 		auto   zDepth = WorldToScreenLoc(a_pos, screenPos);
 		if (zDepth > 0.0f) {
-			ImGui::PushFont(NULL, 30);
+			ImGui::PushFont(nullptr, 30);
 			{
 				auto drawList = ImGui::GetBackgroundDrawList();
 				drawList->AddCircleFilled(screenPos, 6.0f, color);

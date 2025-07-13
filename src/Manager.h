@@ -13,8 +13,7 @@ public:
 	void Draw();
 
 	void AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle);
-	void AddProcessedSubtitle(const char* subtitle);
-	void UpdateSubtitles(RE::SubtitleManager* a_manager) const;
+	void UpdateSubtitleInfo(RE::SubtitleManager* a_manager) const;
 
 	void SetVisible(bool a_visible);
 
@@ -54,11 +53,14 @@ private:
 
 	bool IsVisible() const;
 
+	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
+
+	void                AddProcessedSubtitle(const char* subtitle);
+	const DualSubtitle& GetProcessedSubtitle(const RE::BSString& a_subtitle);
+	void                RebuildProcessedSubtitles();
+
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
 	static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
-
-	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
-	void         RebuildProcessedSubtitles();
 
 	// members
 	mutable RWLock                     subtitleLock;

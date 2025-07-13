@@ -5,7 +5,7 @@ namespace ImGui
 	struct Font
 	{
 		void LoadFontSettings(CSimpleIniA& a_ini, const char* a_section);
-		void LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges = NULL);
+		void LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges = nullptr);
 
 		std::string name{ "Jost-Medium.ttf" };
 		float       size{ 35.0f };
@@ -72,7 +72,8 @@ namespace ImGui
 				auto alpha = std::stoi(rgb_matches[4]);
 
 				return { { red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f }, false };
-			} else if (srell::regex_match(a_str, hex_matches, hex_pattern)) {
+			}
+			if (srell::regex_match(a_str, hex_matches, hex_pattern)) {
 				auto red = std::stoi(hex_matches[1], 0, 16);
 				auto green = std::stoi(hex_matches[2], 0, 16);
 				auto blue = std::stoi(hex_matches[3], 0, 16);

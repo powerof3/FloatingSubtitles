@@ -5,27 +5,6 @@
 #include "RayCaster.h"
 #include "SettingLoader.h"
 
-void Manager::OnDataLoaded()
-{
-	localizedSubs.BuildLocalizedSubtitles();
-	LoadMCMSettings();
-
-	const auto gameMaxDistance = RE::GetINISettingFloat("fMaxSubtitleDistance:Interface");
-	maxDistanceStartSq = gameMaxDistance * gameMaxDistance;
-	maxDistanceEndSq = (gameMaxDistance * 1.05f) * (gameMaxDistance * 1.05f);
-
-	logger::info("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
-}
-
-void Manager::LoadMCMSettings()
-{
-	SettingLoader::GetSingleton()->Load(FileType::kMCM, [this](auto& ini) {
-		LoadMCMSettings(ini);
-	});
-
-	localizedSubs.PostMCMSettingsLoad();
-}
-
 void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 {
 	showGeneralSubtitles = a_ini.GetBoolValue("Settings", "bGeneralSubtitles", showGeneralSubtitles);
@@ -65,6 +44,27 @@ void Manager::LoadMCMSettings(CSimpleIniA& a_ini)
 	}
 }
 
+void Manager::LoadMCMSettings()
+{
+	SettingLoader::GetSingleton()->Load(FileType::kMCM, [this](auto& ini) {
+		LoadMCMSettings(ini);
+	});
+
+	localizedSubs.PostMCMSettingsLoad();
+}
+
+void Manager::OnDataLoaded()
+{
+	localizedSubs.BuildLocalizedSubtitles();
+	LoadMCMSettings();
+
+	const auto gameMaxDistance = RE::GetINISettingFloat("fMaxSubtitleDistance:Interface");
+	maxDistanceStartSq = gameMaxDistance * gameMaxDistance;
+	maxDistanceEndSq = (gameMaxDistance * 1.05f) * (gameMaxDistance * 1.05f);
+
+	logger::info("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
+}
+
 bool Manager::IsVisible() const
 {
 	return visible;
@@ -91,6 +91,16 @@ bool Manager::HasObjectTag(RE::BSString& a_text)
 	return false;
 }
 
+bool Manager::ShowGeneralSubtitles() const
+{
+	return RE::ShowGeneralSubsGame() && current.showGeneralSubtitles;
+}
+
+bool Manager::ShowDialogueSubtitles() const
+{
+	return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles;
+}
+
 bool Manager::HandlesGeneralSubtitles(RE::BSString& a_text) const
 {
 	if (HasObjectTag(a_text)) {
@@ -109,45 +119,6 @@ bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
 	return ShowDialogueSubtitles();
 }
 
-bool Manager::ShowGeneralSubtitles() const
-{
-	return RE::ShowGeneralSubsGame() && current.showGeneralSubtitles;
-}
-
-bool Manager::ShowDialogueSubtitles() const
-{
-	return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles;
-}
-
-RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height)
-{
-	RE::NiPoint3 pos = a_ref->GetPosition();
-	if (const auto headNode = RE::GetHeadNode(a_ref)) {
-		pos = headNode->world.translate;
-	} else {
-		pos.z += a_height;
-	}
-	return pos;
-}
-
-RE::NiPoint3 Manager::CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const
-{
-	const auto ref = a_subInfo.speaker.get();
-	const auto height = ref->GetHeight();
-
-	auto pos = GetSubtitleAnchorPosImpl(ref, height);
-	auto offset = current.subtitleHeadOffset;
-
-	if (auto overridePosZ = ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref, current.useBTPSWidgetPosition, current.useTrueHUDWidgetPosition)) {
-		pos.z = *overridePosZ;
-		offset = current.subtitleHeadOffset * 0.75f;
-	}
-
-	pos.z += offset * (height / 128.0f);
-
-	return pos;
-}
-
 DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
 {
 	auto primarySub = localizedSubs.GetPrimarySubtitle(subtitle);
@@ -158,6 +129,28 @@ DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
 		}
 	}
 	return DualSubtitle(primarySub);
+}
+
+void Manager::AddProcessedSubtitle(const char* subtitle)
+{
+	WriteLocker locker(subtitleLock);
+	processedSubtitles.try_emplace(subtitle, CreateDualSubtitles(subtitle));
+}
+
+const DualSubtitle& Manager::GetProcessedSubtitle(const RE::BSString& a_subtitle)
+{
+	{
+		ReadLocker readLock(subtitleLock);
+		if (auto it = processedSubtitles.find(a_subtitle.c_str()); it != processedSubtitles.end()) {
+			return it->second;
+		}
+	}
+
+	{
+		WriteLocker writeLock(subtitleLock);
+		auto [it, inserted] = processedSubtitles.try_emplace(a_subtitle.c_str(), CreateDualSubtitles(a_subtitle.c_str()));
+		return it->second;
+	}
 }
 
 void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle)
@@ -186,12 +179,6 @@ void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle
 	}
 }
 
-void Manager::AddProcessedSubtitle(const char* subtitle)
-{
-	WriteLocker locker(subtitleLock);
-	processedSubtitles.try_emplace(subtitle, CreateDualSubtitles(subtitle));
-}
-
 void Manager::RebuildProcessedSubtitles()
 {
 	WriteLocker locker(subtitleLock);
@@ -200,7 +187,7 @@ void Manager::RebuildProcessedSubtitles()
 	}
 }
 
-void Manager::UpdateSubtitles(RE::SubtitleManager* a_manager) const
+void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager) const
 {
 	const auto menuTopicMgr = RE::MenuTopicManager::GetSingleton();
 
@@ -233,6 +220,35 @@ void Manager::UpdateSubtitles(RE::SubtitleManager* a_manager) const
 	}
 }
 
+RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height)
+{
+	RE::NiPoint3 pos = a_ref->GetPosition();
+	if (const auto headNode = RE::GetHeadNode(a_ref)) {
+		pos = headNode->world.translate;
+	} else {
+		pos.z += a_height;
+	}
+	return pos;
+}
+
+RE::NiPoint3 Manager::CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const
+{
+	const auto ref = a_subInfo.speaker.get();
+	const auto height = ref->GetHeight();
+
+	auto pos = GetSubtitleAnchorPosImpl(ref, height);
+	auto offset = current.subtitleHeadOffset;
+
+	if (auto overridePosZ = ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref, current.useBTPSWidgetPosition, current.useTrueHUDWidgetPosition)) {
+		pos.z = *overridePosZ;
+		offset = current.subtitleHeadOffset * 0.75f;
+	}
+
+	pos.z += offset * (height / 128.0f);
+
+	return pos;
+}
+
 void Manager::Draw()
 {
 	const bool showGeneral = ShowGeneralSubtitles();
@@ -260,15 +276,12 @@ void Manager::Draw()
 				continue;
 			}
 
-			if (subtitleInfo.isFlagSet(SubtitleFlag::kTalkingActivator)) {
-				continue;
-			}
-
 			if (const auto ref = subtitleInfo.speaker.get()) {
-				const auto actor = ref->As<RE::Actor>();
-				if (!actor) {
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kTalkingActivator)) {
 					continue;
 				}
+
+				const auto actor = ref->As<RE::Actor>();
 
 				if (subtitleInfo.forceDisplay || subtitleInfo.targetDistance <= maxDistanceEndSq) {
 					DualSubtitle::ScreenParams params;
@@ -298,12 +311,7 @@ void Manager::Draw()
 
 					params.spacing = current.subtitleSpacing;
 
-					ReadLocker locker(subtitleLock);
-					{
-						if (auto it = processedSubtitles.find(subtitleInfo.subtitle.c_str()); it != processedSubtitles.end()) {
-							it->second.DrawDualSubtitle(params);
-						}
-					}
+					GetProcessedSubtitle(subtitleInfo.subtitle).DrawDualSubtitle(params);
 				}
 			}
 		}
