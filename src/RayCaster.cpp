@@ -44,34 +44,24 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayC
 	auto       rootColFilter = rootCollidable->broadPhaseHandle.collisionFilterInfo;
 
 	switch (rootColFilter.GetCollisionLayer()) {
-	case RE::COL_LAYER::kUnidentified:
-	case RE::COL_LAYER::kTransparent:
-	case RE::COL_LAYER::kClutter:
-	case RE::COL_LAYER::kProps:
-	case RE::COL_LAYER::kTrigger:
-	case RE::COL_LAYER::kNonCollidable:
-	case RE::COL_LAYER::kCloudTrap:
-	case RE::COL_LAYER::kActorZone:
-	case RE::COL_LAYER::kProjectileZone:
-	case RE::COL_LAYER::kGasTrap:
-	case RE::COL_LAYER::kTransparentSmall:
-	case RE::COL_LAYER::kInvisibleWall:
-	case RE::COL_LAYER::kSpellExplosion:
-		return;
+	case RE::COL_LAYER::kStatic:
+	case RE::COL_LAYER::kTerrain:
+	case RE::COL_LAYER::kGround:
+		{
+			hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
+		}
+		break;
 	case RE::COL_LAYER::kBiped:
 	case RE::COL_LAYER::kBipedNoCC:
 	case RE::COL_LAYER::kDeadBip:
 	case RE::COL_LAYER::kCharController:
 		{
-			auto owner = RE::TESHavokUtilities::FindCollidableRef(*rootCollidable);
-			if (owner && owner != actor) {
-				return;
+			if (const auto owner = RE::TESHavokUtilities::FindCollidableRef(*rootCollidable); owner && owner == actor) {
+				hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
 			}
-			hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
 		}
 		break;
 	default:
-		hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
 		break;
 	}
 }
@@ -90,8 +80,15 @@ bool RayCaster::CanRayCastToTarget(bool a_debugRay)
 		}
 	}
 
-	targetPoints[0] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kHead);
-	targetPoints[1] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kEye);
+	auto cell = actor->parentCell;
+	auto bhkWorld = cell ? cell->GetbhkWorld() : nullptr;
+
+	if (!bhkWorld) {
+		return true;  // can't raycast so might as well return true
+	}
+
+	targetPoints[0] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kEye);
+	targetPoints[1] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kHead);
 	targetPoints[2] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kTorso);
 	targetPoints[3] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kFeet);
 
@@ -115,8 +112,11 @@ bool RayCaster::CanRayCastToTarget(bool a_debugRay)
 		collector.Reset();
 		pickData.rayInput.to = targetPoints[i] * havokWorldScale;
 
-		auto node = RE::TES::GetSingleton()->Pick(pickData);
-		result = node && node->GetUserData() == actor;
+		if (bhkWorld->PickObject(pickData)) {
+			if (auto* collidable = pickData.rayOutput.rootCollidable) {
+				result = RE::TESHavokUtilities::FindCollidableRef(*collidable) == actor;
+			}
+		}
 
 		if (a_debugRay) {
 			DebugRay(pickData, targetPoints[i], debugColors[i]);
