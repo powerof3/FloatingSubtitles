@@ -10,9 +10,7 @@ namespace Hooks
 		{
 			func(a_manager, ref, subtitle, alwaysDisplay);
 
-			if (!string::is_empty(subtitle) && !string::is_only_space(subtitle)) {
-				Manager::GetSingleton()->AddSubtitle(a_manager, subtitle);
-			}
+			Manager::GetSingleton()->AddSubtitle(a_manager, subtitle);
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
 	};

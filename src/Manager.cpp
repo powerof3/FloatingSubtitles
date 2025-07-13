@@ -163,21 +163,24 @@ DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
 
 void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle)
 {
-	AddProcessedSubtitle(a_subtitle);
+	if (!string::is_empty(a_subtitle) && !string::is_only_space(a_subtitle)) {
+		AddProcessedSubtitle(a_subtitle);
 
-	RE::BSSpinLockGuard gameLocker(a_manager->lock);
-	{
-		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(a_manager->subtitles);
-		if (!subtitleArray.empty()) {
-			auto& subInfo = subtitleArray.back();
-			subInfo.flagsRaw() = 0;  // reset any junk values
-			subInfo.setFlag(SubtitleFlag::kObscured, false);
+		RE::BSSpinLockGuard gameLocker(a_manager->lock);
+		{
+			auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(a_manager->subtitles);
+			if (!subtitleArray.empty()) {
+				auto& subInfo = subtitleArray.back();
+				subInfo.flagsRaw() = 0;  // reset any junk values
 
-			if (const auto ref = subInfo.speaker.get()) {
-				bool talkingActivator = !ref->IsActor();
-				subInfo.setFlag(SubtitleFlag::kTalkingActivator, talkingActivator);
-				if (talkingActivator) {
-					AddObjectTag(subInfo.subtitle);
+				subInfo.setFlag(SubtitleFlag::kObscured, false);
+				subInfo.setFlag(SubtitleFlag::kTalkingActivator, false);
+
+				if (const auto ref = subInfo.speaker.get()) {
+					if (!ref->IsActor()) {
+						subInfo.setFlag(SubtitleFlag::kTalkingActivator, true);
+						AddObjectTag(subInfo.subtitle);
+					}
 				}
 			}
 		}
@@ -188,12 +191,6 @@ void Manager::AddProcessedSubtitle(const char* subtitle)
 {
 	WriteLocker locker(subtitleLock);
 	processedSubtitles.try_emplace(subtitle, CreateDualSubtitles(subtitle));
-}
-
-const DualSubtitle& Manager::GetProcessedSubtitles(const RE::BSString& subtitle)
-{
-	ReadLocker locker(subtitleLock);
-	return processedSubtitles.find(subtitle.c_str())->second;
 }
 
 void Manager::RebuildProcessedSubtitles()
@@ -268,15 +265,18 @@ void Manager::Draw()
 				continue;
 			}
 
-			if (auto ref = subtitleInfo.speaker.get()) {
-				auto actor = ref->As<RE::Actor>();
+			if (const auto ref = subtitleInfo.speaker.get()) {
+				const auto actor = ref->As<RE::Actor>();
+				if (!actor) {
+					continue;
+				}
 
 				if (subtitleInfo.forceDisplay || subtitleInfo.targetDistance <= maxDistanceEndSq) {
 					DualSubtitle::ScreenParams params;
 					RE::NiPoint3               anchorPos = CalculateSubtitleAnchorPos(subtitleInfo);
-					auto                       zVal = ImGui::WorldToScreenLoc(anchorPos, params.pos);
+					auto                       zDepth = ImGui::WorldToScreenLoc(anchorPos, params.pos);
 
-					if (zVal < 0.0f) {
+					if (zDepth < 0.0f) {
 						continue;
 					}
 
@@ -291,18 +291,20 @@ void Manager::Draw()
 					if (subtitleInfo.targetDistance > maxDistanceStartSq) {
 						const float t = (subtitleInfo.targetDistance - maxDistanceStartSq) / (maxDistanceEndSq - maxDistanceStartSq);
 						params.alpha *= 1.0f - glm::cubicEaseOut(t);
-					} else if (actor) {
-						if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
-							params.alpha *= high->fadeAlpha;
-						}
-						if (actor->IsDead() && actor->voiceTimer < 1.0f) {
-							params.alpha *= actor->voiceTimer;
-						}
+					} else if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
+						params.alpha *= high->fadeAlpha;
+					} else if (actor->IsDead() && actor->voiceTimer < 1.0f) {
+						params.alpha *= actor->voiceTimer;
 					}
 
 					params.spacing = current.subtitleSpacing;
 
-					GetProcessedSubtitles(subtitleInfo.subtitle).DrawDualSubtitle(params);
+					ReadLocker locker(subtitleLock);
+					{
+						if (auto it = processedSubtitles.find(subtitleInfo.subtitle.c_str()); it != processedSubtitles.end()) {
+							it->second.DrawDualSubtitle(params);
+						}
+					}
 				}
 			}
 		}
