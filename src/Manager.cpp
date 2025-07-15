@@ -192,6 +192,12 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 	a_subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(alpha);
 }
 
+std::string Manager::GetScaleformSubtitle(const RE::BSString& a_subtitle)
+{
+	auto subtitle = GetProcessedSubtitle(a_subtitle).GetScaleformCompatibleSubtitle(settings.offscreenSubs == OffscreenSubtitle::kDual);
+	return subtitle.empty() ? a_subtitle.c_str() : subtitle;
+}
+
 void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle)
 {
 	if (offscreenSubCount > settings.maxOffscreenSubs) {
@@ -200,13 +206,13 @@ void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, cons
 
 	bool dualSubs = settings.offscreenSubs == OffscreenSubtitle::kDual;
 
-	auto localizedSub = localizedSubs.GetLocalizedSubtitleVanilla(a_subtitle.c_str(), dualSubs);
+	auto scaleformSub = GetScaleformSubtitle(a_subtitle);
 	if (std::string name = ModAPIHandler::GetSingleton()->GetReferenceName(a_speaker); !name.empty()) {
-		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColor, name, localizedSub));
+		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColor, name, scaleformSub));
 	} else {
-		offscreenSub.append(localizedSub);
+		offscreenSub.append(scaleformSub);
 	}
-	offscreenSub.append(dualSubs ? "\n\n" : "\n");
+	offscreenSub.append(dualSubs && scaleformSub.contains("\n") ? "\n\n" : "\n");
 
 	offscreenSubCount++;
 }
@@ -236,9 +242,9 @@ void Manager::QueueOffscreenSubtitle() const
 	}
 }
 
-void Manager::QueueDialogueSubtitle(const RE::BSString& a_subtitle) const
+void Manager::QueueDialogueSubtitle(const RE::BSString& a_subtitle)
 {
-	const std::string text = std::format("{}{}", localizedSubs.GetLocalizedSubtitleVanilla(a_subtitle.c_str(), settings.offscreenSubs == OffscreenSubtitle::kDual), objectTag);
+	const std::string text = std::format("{}{}", GetScaleformSubtitle(a_subtitle.c_str()), objectTag);
 	RE::QueueDialogSubtitles(text.c_str());  // ShowDialogueText doesn't work?
 }
 

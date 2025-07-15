@@ -42,6 +42,7 @@ struct LocalizedSubtitle
 
 	std::string   subtitle;
 	std::uint32_t maxCharsPerLine;
+	Language      language{ Language::kEnglish };
 };
 
 class LocalizedSubtitles
@@ -55,8 +56,6 @@ public:
 	LocalizedSubtitle GetPrimarySubtitle(const char* a_localSubtitle) const;
 	LocalizedSubtitle GetSecondarySubtitle(const char* a_localSubtitle) const;
 
-	std::string GetLocalizedSubtitleVanilla(const char* a_localSubtitle, bool a_dualSubtitles) const;
-
 private:
 	using SubtitleID = std::uint64_t;  // hashed id (string id + mod index)
 
@@ -69,7 +68,8 @@ private:
 	void ReadILStringFiles(MultiSubtitleToIDMap& a_multiSubToID, MultiIDToSubtitleMap& a_multiIDToSub) const;
 	void MergeDuplicateSubtitles(const MultiSubtitleToIDMap& a_multiSubToID, const MultiIDToSubtitleMap& a_multiIDToSub);
 
-	std::string ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
+	std::string       ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
+	LocalizedSubtitle GetLocalizedSubtitle(const char* a_localSubtitle, const LanguageSetting& a_setting) const;
 
 	// members
 	Language        gameLanguage{ Language::kEnglish };

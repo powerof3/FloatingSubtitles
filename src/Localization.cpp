@@ -223,31 +223,18 @@ std::string LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, con
 	return a_localSubtitle;
 }
 
+LocalizedSubtitle LocalizedSubtitles::GetLocalizedSubtitle(const char* a_localSubtitle, const LanguageSetting& a_setting) const
+{
+	auto localizedSub = ResolveSubtitle(a_localSubtitle, a_setting);
+	return { localizedSub, a_setting.maxCharsPerLine, localizedSub == a_localSubtitle ? gameLanguage : a_setting.language };
+}
+
 LocalizedSubtitle LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle) const
 {
-	return { ResolveSubtitle(a_localSubtitle, primaryLanguage), primaryLanguage.maxCharsPerLine };
+	return GetLocalizedSubtitle(a_localSubtitle, primaryLanguage);
 }
 
 LocalizedSubtitle LocalizedSubtitles::GetSecondarySubtitle(const char* a_localSubtitle) const
 {
-	return { ResolveSubtitle(a_localSubtitle, secondaryLanguage), secondaryLanguage.maxCharsPerLine };
-}
-
-std::string LocalizedSubtitles::GetLocalizedSubtitleVanilla(const char* a_localSubtitle, bool a_dualSubtitles) const
-{
-	std::string localizedSub;
-
-	auto primarySub = ResolveSubtitle(a_localSubtitle, primaryLanguage);
-	if (RE::BSScaleformManager::GetSingleton()->IsValidName(primarySub.c_str())) {
-		localizedSub = primarySub;
-	}
-	if (a_dualSubtitles) {
-		auto secondarySub = ResolveSubtitle(a_localSubtitle, secondaryLanguage);
-		if (secondarySub != primarySub && RE::BSScaleformManager::GetSingleton()->IsValidName(secondarySub.c_str())) {
-			localizedSub.append("\n");
-			localizedSub.append(secondarySub);
-		}
-	}
-
-	return localizedSub.empty() ? a_localSubtitle : localizedSub;
+	return GetLocalizedSubtitle(a_localSubtitle, secondaryLanguage);
 }

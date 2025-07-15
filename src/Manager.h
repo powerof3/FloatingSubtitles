@@ -77,10 +77,10 @@ private:
 	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
 	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 
-	void BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle);
-	void QueueOffscreenSubtitle() const;
-
-	void QueueDialogueSubtitle(const RE::BSString& a_subtitle) const;
+	std::string GetScaleformSubtitle(const RE::BSString& a_subtitle);
+	void        BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle);
+	void        QueueOffscreenSubtitle() const;
+	void        QueueDialogueSubtitle(const RE::BSString& a_subtitle);
 
 	// members
 	mutable RWLock                     subtitleLock;
