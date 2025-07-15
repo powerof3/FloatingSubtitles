@@ -58,9 +58,6 @@ DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const Loc
 void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
 {
 	const auto& [screenPos, alpha, spacing] = a_screenParams;
-	if (alpha < 0.01f) {
-		return;
-	}
 
 	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(alpha);
 	const auto  lineHeight = ImGui::GetTextLineHeight();

@@ -2,25 +2,6 @@
 
 #include "ImGui/Util.h"
 
-void StartPoint::Init()
-{
-	auto player = RE::PlayerCharacter::GetSingleton();
-	if (!player) {
-		return;
-	}
-
-	debug = player->GetPosition();
-	debug.z += player->eyeHeight;
-
-	if (auto worldRoot = RE::Main::WorldRootNode(); !worldRoot->children.empty()) {
-		camera = worldRoot->children.front()->local.translate;
-	} else if (auto pcCamera = RE::PlayerCamera::GetSingleton(); pcCamera && pcCamera->cameraRoot) {
-		camera = pcCamera->cameraRoot->world.translate;
-	} else {
-		camera = debug;
-	}
-}
-
 RayCollector::RayCollector(RE::Actor* a_actor, RE::COL_LAYER a_layer) :
 	actor(a_actor)
 {
@@ -47,9 +28,7 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayC
 	case RE::COL_LAYER::kStatic:
 	case RE::COL_LAYER::kTerrain:
 	case RE::COL_LAYER::kGround:
-		{
-			hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
-		}
+		hkpClosestRayHitCollector::AddRayHit(a_body, a_hitInfo);
 		break;
 	case RE::COL_LAYER::kBiped:
 	case RE::COL_LAYER::kBipedNoCC:
@@ -66,17 +45,36 @@ void RayCollector::AddRayHit(const RE::hkpCdBody& a_body, const RE::hkpShapeRayC
 	}
 }
 
+void RayCaster::StartPoint::Init()
+{
+	auto player = RE::PlayerCharacter::GetSingleton();
+	if (!player) {
+		return;
+	}
+
+	debug = player->GetPosition();
+	debug.z += player->eyeHeight;
+
+	if (auto worldRoot = RE::Main::WorldRootNode(); !worldRoot->children.empty()) {
+		camera = worldRoot->children.front()->local.translate;
+	} else if (auto pcCamera = RE::PlayerCamera::GetSingleton(); pcCamera && pcCamera->cameraRoot) {
+		camera = pcCamera->cameraRoot->world.translate;
+	} else {
+		camera = debug;
+	}
+}
+
 RayCaster::RayCaster(RE::Actor* a_target) :
 	actor(a_target)
 {
 	startPoint.Init();
 }
 
-bool RayCaster::CanRayCastToTarget(bool a_debugRay)
+RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 {
 	if (auto root = actor->Get3D()) {
-		if (!RE::Main::WorldRootCamera()->PointInFrustum(root->worldBound.center, root->worldBound.radius * 2.0f)) {
-			return false;
+		if (!RE::Main::WorldRootCamera()->PointInFrustum(root->worldBound.center, root->worldBound.radius)) {
+			return Result::kOffScreen;
 		}
 	}
 
@@ -84,7 +82,7 @@ bool RayCaster::CanRayCastToTarget(bool a_debugRay)
 	auto bhkWorld = cell ? cell->GetbhkWorld() : nullptr;
 
 	if (!bhkWorld) {
-		return true;  // can't raycast so might as well return true
+		return Result::kOffScreen;  // can't raycast so might as well return true
 	}
 
 	targetPoints[0] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kEye);
@@ -123,7 +121,7 @@ bool RayCaster::CanRayCastToTarget(bool a_debugRay)
 		}
 	}
 
-	return result;
+	return result ? Result::kVisible : Result::kObscured;
 }
 
 void RayCaster::DebugRay(const RE::bhkPickData& a_pickData, const RE::NiPoint3& a_targetPos, ImU32 color) const

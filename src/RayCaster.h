@@ -1,13 +1,5 @@
 #pragma once
 
-struct StartPoint
-{
-	void Init();
-
-	RE::NiPoint3 camera;
-	RE::NiPoint3 debug;
-};
-
 class RayCollector : public RE::hkpClosestRayHitCollector
 {
 public:
@@ -25,10 +17,25 @@ private:
 class RayCaster
 {
 public:
+	struct StartPoint
+	{
+		void Init();
+
+		RE::NiPoint3 camera;
+		RE::NiPoint3 debug;
+	};
+
+	enum class Result
+	{
+		kOffScreen = 0,
+		kObscured,
+		kVisible
+	};
+
 	RayCaster() = default;
 	RayCaster(RE::Actor* a_target);
 
-	bool CanRayCastToTarget(bool a_debugRay);
+	Result GetResult(bool a_debugRay);
 
 private:
 	void DebugRay(const RE::bhkPickData& a_pickData, const RE::NiPoint3& a_targetPos, ImU32 color) const;

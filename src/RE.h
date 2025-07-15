@@ -52,16 +52,17 @@ namespace RE
 	class SubtitleInfoEx : public SubtitleInfo
 	{
 	public:
-		enum class Flag
+		enum class Flag : std::uint8_t
 		{
 			kNone = 0,
-			kObscured = 1 << 0,
-			kDialogueSubtitle = 1 << 1,
-			kTalkingActivator = 1 << 2,
+			kSkip = 1 << 0,
+			kOffScreen = 1 << 1,
+			kObscured = 1 << 2
 		};
 
-		std::uint8_t& flagsRaw() { return pad1D; }
-		bool          isFlagSet(Flag a_flag) const { return (pad1D & static_cast<std::uint8_t>(a_flag)) != 0; }
+		std::uint32_t& textAlpha() { return pad04; }
+		std::uint8_t&  flagsRaw() { return pad1D; }
+		bool           isFlagSet(Flag a_flag) const { return (pad1D & static_cast<std::uint8_t>(a_flag)) != 0; }
 
 		void setFlag(Flag a_flag, bool a_set);
 	};
@@ -71,11 +72,49 @@ namespace RE
 	NiAVObject* GetTorsoNode(const Actor* a_actor);
 	bool        HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed);
 	void        QueueDialogSubtitles(const char* a_text);
-	std::string GetINISettingString(std::string_view a_setting);
-	float       GetINISettingFloat(std::string_view a_setting);
-	bool        GetINIPrefsSettingBool(std::string_view a_setting);
 	bool        ShowGeneralSubsGame();
 	bool        ShowDialogueSubsGame();
+	void        SendHUDMenuMessage(HUD_MESSAGE_TYPE a_type, const std::string& a_text = "", bool a_show = true);
+
+	template <class T>
+	T GetINISetting(std::string_view a_setting)
+	{
+		auto setting = INISettingCollection::GetSingleton()->GetSetting(a_setting);
+
+		if constexpr (std::is_same_v<T, bool>) {
+			return setting->GetBool();
+		} else if constexpr (std::is_same_v<T, float>) {
+			return setting->GetFloat();
+		} else if constexpr (std::is_same_v<T, std::int32_t>) {
+			return setting->GetSInt();
+		} else if constexpr (std::is_same_v<T, Color>) {
+			return setting->GetColor();
+		} else if constexpr (std::is_same_v<T, std::string>) {
+			return setting->GetString();
+		} else {
+			return setting->GetUInt();
+		}
+	}
+
+	template <class T>
+	T GetINIPrefsSetting(std::string_view a_setting)
+	{
+		auto setting = INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting);
+
+		if constexpr (std::is_same_v<T, bool>) {
+			return setting->GetBool();
+		} else if constexpr (std::is_same_v<T, float>) {
+			return setting->GetFloat();
+		} else if constexpr (std::is_same_v<T, std::int32_t>) {
+			return setting->GetSInt();
+		} else if constexpr (std::is_same_v<T, Color>) {
+			return setting->GetColor();
+		} else if constexpr (std::is_same_v<T, std::string>) {
+			return setting->GetString();
+		} else {
+			return setting->GetUInt();
+		}
+	}
 
 	template <class... Args>
 	bool DispatchStaticCall(BSFixedString a_class, BSFixedString a_fnName, Args&&... a_args)

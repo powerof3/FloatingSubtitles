@@ -190,7 +190,7 @@ void LocalizedSubtitles::MergeDuplicateSubtitles(const MultiSubtitleToIDMap& a_m
 
 void LocalizedSubtitles::BuildLocalizedSubtitles()
 {
-	gameLanguage = to_language(RE::GetINISettingString("sLanguage:General"));
+	gameLanguage = to_language(RE::GetINISetting<std::string>("sLanguage:General"));
 
 	Timer timer;
 	timer.start();

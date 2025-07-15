@@ -13,7 +13,7 @@ public:
 	void Draw();
 
 	void AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle);
-	void UpdateSubtitleInfo(RE::SubtitleManager* a_manager) const;
+	void UpdateSubtitleInfo(RE::SubtitleManager* a_manager);
 
 	void SetVisible(bool a_visible);
 
@@ -25,16 +25,18 @@ private:
 	{
 		void LoadMCMSettings(CSimpleIniA& a_ini);
 
-		float subtitleHeadOffset{ 15.0f };
-		float subtitleSpacing{ 0.5f };
-		bool  showGeneralSubtitles{ true };
-		bool  showDialogueSubtitles{ false };
-		bool  showDualSubs{ false };
-		bool  useBTPSWidgetPosition{ true };
-		bool  useTrueHUDWidgetPosition{ true };
-		bool  doRayCastChecks{ true };
-		bool  fadeSubtitles{ true };
-		float fadeSubtitleAlpha{ 0.35f };
+		float        subtitleHeadOffset{ 15.0f };
+		float        subtitleSpacing{ 0.5f };
+		bool         showGeneralSubtitles{ true };
+		bool         showDialogueSubtitles{ false };
+		bool         showDualSubs{ false };
+		bool         useBTPSWidgetPosition{ true };
+		bool         useTrueHUDWidgetPosition{ true };
+		bool         doRayCastChecks{ true };
+		bool         fadeSubtitles{ true };
+		float        fadeSubtitleAlpha{ 0.35f };
+		bool         useOffscreenSubs;
+		std::uint32_t maxOffscreenSubs{ 3 };
 	};
 
 	using SubtitleFlag = RE::SubtitleInfoEx::Flag;
@@ -48,9 +50,6 @@ private:
 	bool ShowGeneralSubtitles() const;
 	bool ShowDialogueSubtitles() const;
 
-	static void AddObjectTag(RE::BSString& a_text);
-	static bool HasObjectTag(RE::BSString& a_text);
-
 	bool IsVisible() const;
 
 	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
@@ -62,6 +61,10 @@ private:
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
 	static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
 
+	void CalculateAlpha(RE::SubtitleInfoEx& a_subInfo) const;
+
+	void BuildOffscreenSubtitle(std::string& a_subtitle, const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw);
+
 	// members
 	mutable RWLock                     subtitleLock;
 	FlatMap<std::string, DualSubtitle> processedSubtitles;
@@ -69,8 +72,10 @@ private:
 	MCMSettings                        current;
 	float                              maxDistanceStartSq{ 4194304.0f };
 	float                              maxDistanceEndSq{ 4624220.16f };
+	std::int32_t                       speakerColor{};
 	bool                               visible{ true };
 	LocalizedSubtitles                 localizedSubs;
-
-	static constexpr std::string_view objectTag{ "[REF]" };
+	std::string                        offscreenSub{};
+	std::string                        lastOffscreenSub{};
+	std::uint32_t                      offscreenSubCount{ 0 };
 };

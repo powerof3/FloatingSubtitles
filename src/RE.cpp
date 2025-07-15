@@ -82,28 +82,23 @@ namespace RE
 		return func(a_text);
 	}
 
-	std::string GetINISettingString(std::string_view a_setting)
-	{
-		return string::toupper(INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetString());
-	}
-
-	float GetINISettingFloat(std::string_view a_setting)
-	{
-		return INISettingCollection::GetSingleton()->GetSetting(a_setting)->GetFloat();
-	}
-
-	bool GetINIPrefsSettingBool(std::string_view a_setting)
-	{
-		return INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting)->GetBool();
-	}
-
 	bool ShowGeneralSubsGame()
 	{
-		return GetINIPrefsSettingBool("bGeneralSubtitles:Interface");
+		return GetINIPrefsSetting<bool>("bGeneralSubtitles:Interface");
 	}
 
 	bool ShowDialogueSubsGame()
 	{
-		return GetINIPrefsSettingBool("bDialogueSubtitles:Interface");
+		return GetINIPrefsSetting<bool>("bDialogueSubtitles:Interface");
+	}
+
+	void SendHUDMenuMessage(HUD_MESSAGE_TYPE a_type, const std::string& a_text, bool a_show)
+	{
+		if (auto hudData = static_cast<HUDData*>(UIMessageQueue::GetSingleton()->CreateUIMessageData(InterfaceStrings::GetSingleton()->hudData))) {
+			hudData->type = a_type;
+			hudData->show = a_show;
+			hudData->text = a_text;
+			UIMessageQueue::GetSingleton()->AddMessage(InterfaceStrings::GetSingleton()->hudMenu, UI_MESSAGE_TYPE::kUpdate, hudData);
+		}
 	}
 }
