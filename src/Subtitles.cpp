@@ -27,7 +27,7 @@ std::vector<Subtitle::Line> Subtitle::WrapText(const LocalizedSubtitle& a_subtit
 	return lines;
 }
 
-void Subtitle::WrapCJKText(std::vector<Subtitle::Line>& lines, const std::string& text, std::uint32_t maxLineWidth)
+void Subtitle::WrapCJKText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth)
 {
 	constexpr auto GetUTF8CharLength = [](const std::string& str, std::size_t pos) {
 		const auto ch = static_cast<unsigned char>(str[pos]);
@@ -97,15 +97,15 @@ void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_
 		return;
 	}
 
-	auto*       drawList = ImGui::GetForegroundDrawList();
-	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(a_alpha);
+	auto* drawList = ImGui::GetForegroundDrawList();
+	const auto& [textColor, shadowColor, shadowOffset] = ImGui::FontStyles::GetSingleton()->GetStyleParams(a_alpha);
 
 	for (const auto& [line, textSize] : lines) {
 		a_posY -= a_lineHeight;
 
 		const ImVec2 textPos(a_posX - (textSize.x * 0.5f), a_posY);
-		drawList->AddText(textPos + styleParams.shadowOffset, styleParams.shadowColor, line.c_str());
-		drawList->AddText(textPos, styleParams.textColor, line.c_str());
+		drawList->AddText(textPos + shadowOffset, shadowColor, line.c_str());
+		drawList->AddText(textPos, textColor, line.c_str());
 	}
 }
 
