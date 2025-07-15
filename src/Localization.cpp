@@ -208,28 +208,19 @@ void LocalizedSubtitles::BuildLocalizedSubtitles()
 
 LocalizedSubtitle LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const
 {
-	const auto maxCharsPerLine = a_language.maxCharsPerLine;
-
 	if (a_language == gameLanguage) {
-		return { a_localSubtitle, maxCharsPerLine };
+		return { a_localSubtitle, a_language.maxCharsPerLine };
 	}
 
-	auto idIt = subtitleToID.find(a_localSubtitle);
-	if (idIt == subtitleToID.end()) {
-		return { a_localSubtitle, maxCharsPerLine };
+	if (const auto idIt = subtitleToID.find(a_localSubtitle); idIt != subtitleToID.end()) {
+		if (const auto mapIt = idToSubtitle.find(idIt->second); mapIt != idToSubtitle.end()) {
+			if (const auto subtitleIt = mapIt->second.find(a_language.language); subtitleIt != mapIt->second.end()) {
+				return { subtitleIt->second, a_language.maxCharsPerLine };
+			}
+		}
 	}
 
-	auto mapIt = idToSubtitle.find(idIt->second);
-	if (mapIt == idToSubtitle.end()) {
-		return { a_localSubtitle, maxCharsPerLine };
-	}
-
-	auto subtitleIt = mapIt->second.find(a_language.language);
-	if (subtitleIt == mapIt->second.end()) {
-		return { a_localSubtitle, maxCharsPerLine };
-	}
-
-	return { subtitleIt->second, maxCharsPerLine };
+	return { a_localSubtitle, a_language.maxCharsPerLine };
 }
 
 LocalizedSubtitle LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle) const

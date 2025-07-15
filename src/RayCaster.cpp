@@ -126,7 +126,7 @@ RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 
 void RayCaster::DebugRay(const RE::bhkPickData& a_pickData, const RE::NiPoint3& a_targetPos, ImU32 color) const
 {
-	auto hitPos = (a_targetPos - startPoint.debug) * a_pickData.rayOutput.hitFraction + startPoint.debug;
+	const auto hitPos = (a_targetPos - startPoint.debug) * a_pickData.rayOutput.hitFraction + startPoint.debug;
 
 	ImGui::DrawLine(startPoint.debug, hitPos, a_pickData.rayOutput.HasHit() ? color : IM_COL32_BLACK);
 

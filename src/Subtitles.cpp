@@ -33,16 +33,21 @@ std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uin
 	return lines;
 }
 
-void Subtitle::DrawSubtitle(float a_posX, float& a_posY, const ImGui::StyleParams& a_params, float a_lineHeight) const
+void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alphaMult, float a_lineHeight) const
 {
+	if (a_alphaMult < 0.01f) {
+		return;
+	}
+
 	auto* drawList = ImGui::GetForegroundDrawList();
+	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(a_alphaMult);
 
 	for (const auto& [line, textSize] : lines) {
 		a_posY -= a_lineHeight;
 
 		const ImVec2 textPos(a_posX - (textSize.x * 0.5f), a_posY);
-		drawList->AddText(textPos + a_params.shadowOffset, a_params.shadowColor, line.c_str());
-		drawList->AddText(textPos, a_params.textColor, line.c_str());
+		drawList->AddText(textPos + styleParams.shadowOffset, styleParams.shadowColor, line.c_str());
+		drawList->AddText(textPos, styleParams.textColor, line.c_str());
 	}
 }
 
@@ -57,16 +62,13 @@ DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const Loc
 
 void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
 {
-	const auto& [screenPos, alpha, spacing] = a_screenParams;
+	const auto lineHeight = ImGui::GetTextLineHeight();
+	auto       posY = a_screenParams.pos.y;
 
-	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(alpha);
-	const auto  lineHeight = ImGui::GetTextLineHeight();
-	auto        posY = screenPos.y;
-
-	primary.DrawSubtitle(screenPos.x, posY, styleParams, lineHeight);
+	primary.DrawSubtitle(a_screenParams.pos.x, posY, a_screenParams.alphaPrimary, lineHeight);
 
 	if (!secondary.lines.empty()) {
-		posY -= lineHeight * spacing;
-		secondary.DrawSubtitle(screenPos.x, posY, styleParams, lineHeight);
+		posY -= lineHeight * a_screenParams.spacing;
+		secondary.DrawSubtitle(a_screenParams.pos.x, posY, a_screenParams.alphaSecondary, lineHeight);
 	}
 }

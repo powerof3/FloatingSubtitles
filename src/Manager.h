@@ -25,17 +25,19 @@ private:
 	{
 		void LoadMCMSettings(CSimpleIniA& a_ini);
 
-		float        subtitleHeadOffset{ 15.0f };
-		float        subtitleSpacing{ 0.5f };
-		bool         showGeneralSubtitles{ true };
-		bool         showDialogueSubtitles{ false };
-		bool         showDualSubs{ false };
-		bool         useBTPSWidgetPosition{ true };
-		bool         useTrueHUDWidgetPosition{ true };
-		bool         doRayCastChecks{ true };
-		bool         fadeSubtitles{ true };
-		float        fadeSubtitleAlpha{ 0.35f };
-		bool         useOffscreenSubs;
+		float         subtitleHeadOffset{ 15.0f };
+		float         subtitleSpacing{ 0.5f };
+		bool          showGeneralSubtitles{ true };
+		bool          showDialogueSubtitles{ false };
+		bool          showDualSubs{ false };
+		bool          useBTPSWidgetPosition{ true };
+		bool          useTrueHUDWidgetPosition{ true };
+		bool          doRayCastChecks{ true };
+		bool          fadeSubtitles{ true };
+		float         fadeSubtitleAlpha{ 0.35f };
+		float         subtitleAlphaPrimary{ 1.0f };
+		float         subtitleAlphaSecondary{ 1.0f };
+		bool          useOffscreenSubs;
 		std::uint32_t maxOffscreenSubs{ 3 };
 	};
 

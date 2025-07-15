@@ -18,7 +18,7 @@ struct Subtitle
 	Subtitle() = default;
 	Subtitle(const LocalizedSubtitle& a_subtitle);
 
-	void DrawSubtitle(float a_posX, float& a_posY, const ImGui::StyleParams& a_params, float a_lineHeight) const;
+	void DrawSubtitle(float a_posX, float& a_posY, float a_alphaMult, float a_lineHeight) const;
 
 	std::vector<Line> lines;
 
@@ -31,7 +31,8 @@ struct DualSubtitle
 	struct ScreenParams
 	{
 		ImVec2 pos{};
-		float  alpha{ 1.0f };
+		float  alphaPrimary{ 1.0f };
+		float  alphaSecondary{ 1.0f };
 		float  spacing{ 0.5f };
 	};
 

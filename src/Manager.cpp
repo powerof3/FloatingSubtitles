@@ -23,6 +23,9 @@ void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 
 	useBTPSWidgetPosition = a_ini.GetBoolValue("Settings", "bUseBTPSWidgetPosition", useBTPSWidgetPosition);
 	useTrueHUDWidgetPosition = a_ini.GetBoolValue("Settings", "bUseTrueHUDWidgetPosition", useTrueHUDWidgetPosition);
+
+	subtitleAlphaPrimary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaPrimary", subtitleAlphaPrimary));
+	subtitleAlphaSecondary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaSecondary", subtitleAlphaSecondary));
 }
 
 void Manager::LoadMCMSettings(CSimpleIniA& a_ini)
@@ -306,6 +309,8 @@ void Manager::Draw()
 		{
 			DualSubtitle::ScreenParams params;
 			params.spacing = current.subtitleSpacing;
+			params.alphaPrimary = current.subtitleAlphaPrimary;
+			params.alphaSecondary = current.subtitleAlphaSecondary;
 
 			for (auto& subtitleInfo : subtitleArray | std::views::reverse) {  // reverse order so closer subtitles get rendered on top
 				if (subtitleInfo.isFlagSet(SubtitleFlag::kSkip) || subtitleInfo.isFlagSet(SubtitleFlag::kOffScreen)) {
@@ -322,10 +327,9 @@ void Manager::Draw()
 					continue;
 				}
 
-				params.alpha = std::bit_cast<float>(subtitleInfo.textAlpha());
-				if (params.alpha < 0.01f) {
-					continue;
-				}
+				auto alphaMult = std::bit_cast<float>(subtitleInfo.textAlpha());
+				params.alphaPrimary *= alphaMult;
+				params.alphaSecondary *= alphaMult;
 
 				GetProcessedSubtitle(subtitleInfo.subtitle).DrawDualSubtitle(params);
 			}
