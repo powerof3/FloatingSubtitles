@@ -17,28 +17,36 @@ public:
 
 	void SetVisible(bool a_visible);
 
-	bool HandlesGeneralSubtitles(RE::BSString& a_text) const;
+	bool ShowGeneralSubtitles() const;
+	bool ShowDialogueSubtitles() const;
+
 	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
 
 private:
 	struct MCMSettings
 	{
-		void LoadMCMSettings(CSimpleIniA& a_ini);
+		std::pair<bool, bool> LoadMCMSettings(CSimpleIniA& a_ini);
 
-		float         subtitleHeadOffset{ 15.0f };
-		float         subtitleSpacing{ 0.5f };
-		bool          showGeneralSubtitles{ true };
-		bool          showDialogueSubtitles{ false };
-		bool          showDualSubs{ false };
-		bool          useBTPSWidgetPosition{ true };
-		bool          useTrueHUDWidgetPosition{ true };
-		bool          doRayCastChecks{ true };
-		bool          fadeSubtitles{ true };
-		float         fadeSubtitleAlpha{ 0.35f };
-		float         subtitleAlphaPrimary{ 1.0f };
-		float         subtitleAlphaSecondary{ 1.0f };
-		bool          useOffscreenSubs;
-		std::uint32_t maxOffscreenSubs{ 3 };
+		struct StoredSettings
+		{
+			bool showGeneralSubtitles{ true };
+			bool showDialogueSubtitles{ false };
+			bool showDualSubs{ false };
+		};
+
+		StoredSettings previous{};
+		StoredSettings current{};
+		float          subtitleHeadOffset{ 15.0f };
+		float          subtitleSpacing{ 0.5f };
+		bool           useBTPSWidgetPosition{ true };
+		bool           useTrueHUDWidgetPosition{ true };
+		bool           doRayCastChecks{ true };
+		bool           fadeSubtitles{ true };
+		float          fadeSubtitleAlpha{ 0.35f };
+		float          subtitleAlphaPrimary{ 1.0f };
+		float          subtitleAlphaSecondary{ 1.0f };
+		bool           useOffscreenSubs;
+		std::uint32_t  maxOffscreenSubs{ 3 };
 	};
 
 	using SubtitleFlag = RE::SubtitleInfoEx::Flag;
@@ -47,12 +55,9 @@ private:
 	using ReadLocker = std::shared_lock<RWLock>;
 	using WriteLocker = std::unique_lock<RWLock>;
 
-	void LoadMCMSettings(CSimpleIniA& a_ini);
-
-	bool ShowGeneralSubtitles() const;
-	bool ShowDialogueSubtitles() const;
-
 	bool IsVisible() const;
+
+	static bool HasObjectTag(RE::BSString& a_text);
 
 	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
 
@@ -63,15 +68,16 @@ private:
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
 	static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
 
-	void CalculateAlpha(RE::SubtitleInfoEx& a_subInfo) const;
+	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
+	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 
-	void BuildOffscreenSubtitle(std::string& a_subtitle, const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw);
+	void BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw);
+	void QueueOffscreenSubtitle() const;
 
 	// members
 	mutable RWLock                     subtitleLock;
 	FlatMap<std::string, DualSubtitle> processedSubtitles;
-	MCMSettings                        previous;
-	MCMSettings                        current;
+	MCMSettings                        settings;
 	float                              maxDistanceStartSq{ 4194304.0f };
 	float                              maxDistanceEndSq{ 4624220.16f };
 	std::int32_t                       speakerColor{};
@@ -80,4 +86,6 @@ private:
 	std::string                        offscreenSub{};
 	std::string                        lastOffscreenSub{};
 	std::uint32_t                      offscreenSubCount{ 0 };
+
+	static constexpr std::string_view objectTag{ "[REF]" };
 };

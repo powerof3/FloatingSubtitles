@@ -1,6 +1,7 @@
 #pragma once
 
 #include "API/BTPS_API_decl.h"
+#include "API/NND_API.h"
 #include "API/TrueHUDAPI.h"
 
 class ModAPIHandler
@@ -45,15 +46,25 @@ public:
 		WidgetAnchor             infoBarAnchor{};
 	};
 
+	struct NND
+	{
+		void        GetAPI();
+		std::string GetReferenceName(const RE::TESObjectREFRPtr& a_ref) const;
+
+		NND_API::IVNND2* api{};
+	};
+
 	void LoadModSettings();
 	void LoadAPIs();
 
 	std::optional<float> GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const;
 	float                GetResolutionScale() const;
+	std::string          GetReferenceName(const RE::TESObjectREFRPtr& a_ref) const;
 
 	DisplayTweaks displayTweaks;
 	BTPS          btps;
 	TrueHUD       trueHUD;
+	NND           nnd;
 
 	static ModAPIHandler instance;
 };

@@ -4,7 +4,8 @@
 #include "ImGui/FontStyles.h"
 
 Subtitle::Subtitle(const LocalizedSubtitle& a_subtitle) :
-	lines(WrapText(a_subtitle.subtitle, a_subtitle.maxCharsPerLine))
+	lines(WrapText(a_subtitle.subtitle, a_subtitle.maxCharsPerLine)),
+	fullSubtitle(a_subtitle.subtitle)
 {}
 
 std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uint32_t maxWidth)
@@ -15,13 +16,15 @@ std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uin
 	std::string        currentLine;
 
 	while (wordStream >> word) {
-		if (currentLine.size() + 1 + word.size() <= maxWidth) {
-			currentLine += ' ' + word;
+		std::string line = currentLine.empty() ? word : currentLine + ' ' + word;
+		if (line.size() <= maxWidth) {
+			currentLine = line;
 		} else {
-			lines.emplace_back(currentLine, ImGui::CalcTextSize(currentLine.c_str()));
+			if (!currentLine.empty()) {
+				lines.emplace_back(currentLine, ImGui::CalcTextSize(currentLine.c_str()));
+			}
 			currentLine = word;
 		}
-		string::trim(currentLine);
 	}
 
 	if (!currentLine.empty()) {
@@ -29,18 +32,17 @@ std::vector<Subtitle::Line> Subtitle::WrapText(const std::string& text, std::uin
 	}
 
 	std::ranges::reverse(lines);  // for drawing lines from bottom to top
-
 	return lines;
 }
 
-void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alphaMult, float a_lineHeight) const
+void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_lineHeight) const
 {
-	if (a_alphaMult < 0.01f) {
+	if (a_alpha < 0.01f) {
 		return;
 	}
 
-	auto* drawList = ImGui::GetForegroundDrawList();
-	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(a_alphaMult);
+	auto*       drawList = ImGui::GetForegroundDrawList();
+	const auto& styleParams = ImGui::FontStyles::GetSingleton()->GetStyleParams(a_alpha);
 
 	for (const auto& [line, textSize] : lines) {
 		a_posY -= a_lineHeight;

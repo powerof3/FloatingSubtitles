@@ -27,7 +27,7 @@ public:
 
 	enum class Result
 	{
-		kOffScreen = 0,
+		kOffscreen = 0,
 		kObscured,
 		kVisible
 	};

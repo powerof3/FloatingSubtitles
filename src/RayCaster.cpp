@@ -74,7 +74,7 @@ RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 {
 	if (auto root = actor->Get3D()) {
 		if (!RE::Main::WorldRootCamera()->PointInFrustum(root->worldBound.center, root->worldBound.radius)) {
-			return Result::kOffScreen;
+			return Result::kOffscreen;
 		}
 	}
 
@@ -82,7 +82,7 @@ RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 	auto bhkWorld = cell ? cell->GetbhkWorld() : nullptr;
 
 	if (!bhkWorld) {
-		return Result::kOffScreen;  // can't raycast so might as well return true
+		return Result::kOffscreen;  // can't raycast so might as well return true
 	}
 
 	targetPoints[0] = actor->CalculateLOSLocation(RE::ACTOR_LOS_LOCATION::kEye);

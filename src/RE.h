@@ -56,11 +56,11 @@ namespace RE
 		{
 			kNone = 0,
 			kSkip = 1 << 0,
-			kOffScreen = 1 << 1,
+			kOffscreen = 1 << 1,
 			kObscured = 1 << 2
 		};
 
-		std::uint32_t& textAlpha() { return pad04; }
+		std::uint32_t& alphaModifier() { return pad04; }
 		std::uint8_t&  flagsRaw() { return pad1D; }
 		bool           isFlagSet(Flag a_flag) const { return (pad1D & static_cast<std::uint8_t>(a_flag)) != 0; }
 

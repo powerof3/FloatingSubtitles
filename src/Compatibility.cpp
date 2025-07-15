@@ -99,6 +99,30 @@ void ModAPIHandler::TrueHUD::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std
 	}
 }
 
+void ModAPIHandler::NND::GetAPI()
+{
+	logger::info("Retrieving NPCs Names Distributor API...");
+	api = reinterpret_cast<NND_API::IVNND2*>(NND_API::RequestPluginAPI());
+	if (api) {
+		logger::info("\tNPCs Names Distributor API is up to date!");
+	} else {
+		logger::info("\tUnable to acquire NPCs Names Distributor API");
+	}
+}
+
+std::string ModAPIHandler::NND::GetReferenceName(const RE::TESObjectREFRPtr& a_ref) const
+{
+	if (api) {
+		if (auto actor = a_ref->As<RE::Actor>()) {
+			if (auto name = api->GetName(actor, NND_API::NameContext::kSubtitles); !name.empty()) {
+				return name.data();
+			}
+		}
+	}
+
+	return a_ref->GetDisplayFullName();
+}
+
 void ModAPIHandler::LoadModSettings()
 {
 	displayTweaks.LoadSettings();
@@ -125,4 +149,9 @@ std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_
 float ModAPIHandler::GetResolutionScale() const
 {
 	return displayTweaks.GetResolutionScale();
+}
+
+std::string ModAPIHandler::GetReferenceName(const RE::TESObjectREFRPtr& a_ref) const
+{
+	return nnd.GetReferenceName(a_ref);
 }

@@ -1,15 +1,17 @@
 #include "Manager.h"
 
 #include "Compatibility.h"
-#include "ImGui/FontStyles.h"
 #include "ImGui/Util.h"
 #include "RayCaster.h"
 #include "SettingLoader.h"
 
-void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
+std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 {
-	showGeneralSubtitles = a_ini.GetBoolValue("Settings", "bGeneralSubtitles", showGeneralSubtitles);
-	showDialogueSubtitles = a_ini.GetBoolValue("Settings", "bDialogueSubtitles", showDialogueSubtitles);
+	previous = current;
+
+	current.showGeneralSubtitles = a_ini.GetBoolValue("Settings", "bGeneralSubtitles", current.showGeneralSubtitles);
+	current.showDialogueSubtitles = a_ini.GetBoolValue("Settings", "bDialogueSubtitles", current.showDialogueSubtitles);
+	current.showDualSubs = a_ini.GetBoolValue("Settings", "bDualSubtitles", current.showDualSubs);
 
 	subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * ModAPIHandler::GetSingleton()->GetResolutionScale();
 
@@ -18,7 +20,6 @@ void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 	fadeSubtitles = a_ini.GetBoolValue("Settings", "bFadeOutOfSightSubtitles", fadeSubtitles);
 	fadeSubtitleAlpha = static_cast<float>(a_ini.GetDoubleValue("Settings", "fFadedSubtitleOpacity", fadeSubtitleAlpha));
 
-	showDualSubs = a_ini.GetBoolValue("Settings", "bDualSubtitles", showDualSubs);
 	subtitleSpacing = static_cast<float>(a_ini.GetDoubleValue("Settings", "fDualSubtitleSpacing", subtitleSpacing));
 
 	useBTPSWidgetPosition = a_ini.GetBoolValue("Settings", "bUseBTPSWidgetPosition", useBTPSWidgetPosition);
@@ -26,29 +27,32 @@ void Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 
 	subtitleAlphaPrimary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaPrimary", subtitleAlphaPrimary));
 	subtitleAlphaSecondary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaSecondary", subtitleAlphaSecondary));
-}
 
-void Manager::LoadMCMSettings(CSimpleIniA& a_ini)
-{
-	previous = current;
+	useOffscreenSubs = a_ini.GetBoolValue("Settings", "bEnableOffscreenSubtitles", useOffscreenSubs);
+	maxOffscreenSubs = a_ini.GetLongValue("Settings", "iMaxOffscreenSubtitles", maxOffscreenSubs);
 
-	current.LoadMCMSettings(a_ini);
-	bool rebuildSubs = localizedSubs.LoadMCMSettings(a_ini);
-
-	// force hide vanilla subtitle
-	if (!previous.showGeneralSubtitles && current.showGeneralSubtitles || !previous.showDialogueSubtitles && current.showDialogueSubtitles) {
-		RE::SendHUDMenuMessage(RE::HUD_MESSAGE_TYPE::kHideSubtitle);
-	}
-
-	if (previous.showDualSubs != current.showDualSubs || rebuildSubs) {
-		RebuildProcessedSubtitles();
-	}
+	return {
+		previous.showDualSubs != current.showDualSubs, (!previous.showGeneralSubtitles && current.showGeneralSubtitles || !previous.showDialogueSubtitles && current.showDialogueSubtitles)
+	};  // rebuild subs, hide subtitles
 }
 
 void Manager::LoadMCMSettings()
 {
 	SettingLoader::GetSingleton()->Load(FileType::kMCM, [this](auto& ini) {
-		LoadMCMSettings(ini);
+		bool rebuildSubs = false;
+		bool hideSubs = false;
+
+		std::tie(rebuildSubs, hideSubs) = settings.LoadMCMSettings(ini);
+		rebuildSubs |= localizedSubs.LoadMCMSettings(ini);
+
+		// force hide vanilla subtitle
+		if (hideSubs) {
+			RE::SendHUDMenuMessage(RE::HUD_MESSAGE_TYPE::kHideSubtitle);
+		}
+
+		if (rebuildSubs) {
+			RebuildProcessedSubtitles();
+		}
 	});
 
 	localizedSubs.PostMCMSettingsLoad();
@@ -78,30 +82,40 @@ void Manager::SetVisible(bool a_visible)
 	visible = a_visible;
 }
 
+bool Manager::HasObjectTag(RE::BSString& a_text)
+{
+	std::string text = a_text.c_str();
+	if (text.ends_with(objectTag)) {
+		text.erase(text.length() - objectTag.length());
+		a_text = text;
+		return true;
+	}
+	return false;
+}
+
 bool Manager::ShowGeneralSubtitles() const
 {
-	return RE::ShowGeneralSubsGame() && current.showGeneralSubtitles;
+	return RE::ShowGeneralSubsGame() && settings.current.showGeneralSubtitles;
+}
+
+bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
+{
+	if (a_text && HasObjectTag(*a_text)) {
+		return false;
+	}
+
+	return ShowDialogueSubtitles();
 }
 
 bool Manager::ShowDialogueSubtitles() const
 {
-	return RE::ShowDialogueSubsGame() && current.showDialogueSubtitles;
-}
-
-bool Manager::HandlesGeneralSubtitles(RE::BSString&) const
-{
-	return ShowGeneralSubtitles();
-}
-
-bool Manager::HandlesDialogueSubtitles(RE::BSString*) const
-{
-	return ShowDialogueSubtitles();
+	return RE::ShowDialogueSubsGame() && settings.current.showDialogueSubtitles;
 }
 
 DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
 {
 	auto primarySub = localizedSubs.GetPrimarySubtitle(subtitle);
-	if (current.showDualSubs) {
+	if (settings.current.showDualSubs) {
 		auto secondarySub = localizedSubs.GetSecondarySubtitle(subtitle);
 		if (!primarySub.empty() && !secondarySub.empty() && primarySub != secondarySub) {
 			return DualSubtitle(primarySub, secondarySub);
@@ -156,6 +170,91 @@ void Manager::RebuildProcessedSubtitles()
 	}
 }
 
+void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
+{
+	const auto ref = a_subInfo.speaker.get();
+	const auto actor = ref->As<RE::Actor>();
+
+	float alpha = 1.0f;
+
+	if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
+		if (settings.fadeSubtitles) {
+			alpha *= settings.fadeSubtitleAlpha;
+		}
+	}
+
+	if (a_subInfo.targetDistance > maxDistanceStartSq) {
+		const float t = (a_subInfo.targetDistance - maxDistanceStartSq) / (maxDistanceEndSq - maxDistanceStartSq);
+		alpha *= 1.0f - glm::cubicEaseOut(t);
+	} else if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
+		alpha *= high->fadeAlpha;
+	} else if (actor->IsDead() && actor->voiceTimer < 1.0f) {
+		alpha *= actor->voiceTimer;
+	}
+
+	a_subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(alpha);
+}
+
+void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw)
+{
+	if (offscreenSubCount > settings.maxOffscreenSubs) {
+		return;
+	}
+
+	if (std::string name = ModAPIHandler::GetSingleton()->GetReferenceName(a_speaker); !name.empty()) {
+		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}\n", speakerColor, name, a_subtitleRaw.c_str()));
+	} else {
+		offscreenSub.append(std::format("{}\n", a_subtitleRaw.c_str()));
+	}
+
+	offscreenSubCount++;
+}
+
+void Manager::QueueOffscreenSubtitle() const
+{
+	if (!settings.useOffscreenSubs) {
+		return;
+	}
+
+	if (lastOffscreenSub != offscreenSub) {
+		const std::string currentSub = offscreenSub;
+		const std::string prevSub = lastOffscreenSub;
+
+		SKSE::GetTaskInterface()->AddUITask([currentSub, prevSub]() {
+			if (auto hudMenu = RE::UI::GetSingleton()->GetMenu<RE::HUDMenu>()) {
+				if (!prevSub.empty()) {
+					RE::GFxValue subtitleText(prevSub);
+					hudMenu->root.Invoke("HideSubtitle", nullptr, &subtitleText, 1);
+				}
+				if (!currentSub.empty()) {
+					RE::GFxValue subtitleText(currentSub);
+					hudMenu->root.Invoke("ShowSubtitle", nullptr, &subtitleText, 1);
+				}
+			}
+		});
+	}
+}
+
+void Manager::CalculateVisibility(RE::SubtitleInfoEx& a_subInfo)
+{
+	const auto ref = a_subInfo.speaker.get();
+	const auto actor = ref->As<RE::Actor>();
+
+	switch (RayCaster(actor).GetResult(false)) {
+	case RayCaster::Result::kOffscreen:
+		{
+			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kOffscreen, true);
+			BuildOffscreenSubtitle(ref, a_subInfo.subtitle);
+		}
+		break;
+	case RayCaster::Result::kObscured:
+		a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kObscured, true);
+		break;
+	default:
+		break;
+	}
+}
+
 void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 {
 	const auto menuTopicMgr = RE::MenuTopicManager::GetSingleton();
@@ -169,6 +268,7 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 
 		lastOffscreenSub = offscreenSub;
 		offscreenSub.clear();
+		offscreenSubCount = 0;
 
 		for (auto& subtitleInfo : subtitleArray) {
 			subtitleInfo.flagsRaw() = 0;
@@ -185,43 +285,21 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 
 				if (!ref->IsActor()) {
 					subtitleInfo.setFlag(SubtitleFlag::kSkip, true);
-					BuildOffscreenSubtitle(offscreenSub, ref, subtitleInfo.subtitle);
+					if (!isDialogueSpeaker) {
+						BuildOffscreenSubtitle(ref, subtitleInfo.subtitle);
+					} else {
+						std::string text = std::format("{}{}", subtitleInfo.subtitle.c_str(), objectTag);
+						RE::QueueDialogSubtitles(text.c_str()); // ShowDialogueText doesn't work?
+					}
 					continue;
 				}
 
-				CalculateAlpha(subtitleInfo);
-
-				const auto actor = ref->As<RE::Actor>();
-
-				switch (RayCaster(actor).GetResult(false)) {
-				case RayCaster::Result::kOffScreen:
-					{
-						subtitleInfo.setFlag(RE::SubtitleInfoEx::Flag::kOffScreen, true);
-						BuildOffscreenSubtitle(offscreenSub, ref, subtitleInfo.subtitle);
-					}
-					break;
-				case RayCaster::Result::kObscured:
-					subtitleInfo.setFlag(RE::SubtitleInfoEx::Flag::kObscured, true);
-					break;
-				default:
-					break;
-				}
+				CalculateAlphaModifier(subtitleInfo);
+				CalculateVisibility(subtitleInfo);
 			}
 		}
 
-		if (lastOffscreenSub != offscreenSub || !offscreenSub.empty()) {
-			SKSE::GetTaskInterface()->AddUITask([this]() {
-				if (auto hudMenu = RE::UI::GetSingleton()->GetMenu<RE::HUDMenu>()) {
-					if (lastOffscreenSub != offscreenSub) {
-						RE::GFxValue subtitleText(lastOffscreenSub);
-						hudMenu->root.Invoke("HideSubtitle", nullptr, &subtitleText, 1);
-					} else if (!offscreenSub.empty()) {
-						RE::GFxValue subtitleText(offscreenSub);
-						hudMenu->root.Invoke("ShowSubtitle", nullptr, &subtitleText, 1);
-					}
-				}
-			});
-		}
+		QueueOffscreenSubtitle();
 	}
 }
 
@@ -236,51 +314,17 @@ RE::NiPoint3 Manager::GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref
 	return pos;
 }
 
-void Manager::CalculateAlpha(RE::SubtitleInfoEx& a_subInfo) const
-{
-	const auto ref = a_subInfo.speaker.get();
-	const auto actor = ref->As<RE::Actor>();
-
-	float alpha = 1.0f;
-
-	if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
-		if (current.fadeSubtitles) {
-			alpha *= current.fadeSubtitleAlpha;
-		}
-	}
-
-	if (a_subInfo.targetDistance > maxDistanceStartSq) {
-		const float t = (a_subInfo.targetDistance - maxDistanceStartSq) / (maxDistanceEndSq - maxDistanceStartSq);
-		alpha *= 1.0f - glm::cubicEaseOut(t);
-	} else if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
-		alpha *= high->fadeAlpha;
-	} else if (actor->IsDead() && actor->voiceTimer < 1.0f) {
-		alpha *= actor->voiceTimer;
-	}
-
-	a_subInfo.textAlpha() = std::bit_cast<std::uint32_t>(alpha);
-}
-
-void Manager::BuildOffscreenSubtitle(std::string& a_subtitle, const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw)
-{
-	if (offscreenSubCount > current.maxOffscreenSubs) {
-		return;
-	}
-	a_subtitle.append(std::format("<font color='#{:6X}'>{}</font>: {}\n", speakerColor, a_speaker->GetDisplayFullName(), a_subtitleRaw.c_str()));
-	offscreenSubCount++;
-}
-
 RE::NiPoint3 Manager::CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const
 {
 	const auto ref = a_subInfo.speaker.get();
 	const auto height = ref->GetHeight();
 
 	auto pos = GetSubtitleAnchorPosImpl(ref, height);
-	auto offset = current.subtitleHeadOffset;
+	auto offset = settings.subtitleHeadOffset;
 
-	if (auto overridePosZ = ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref, current.useBTPSWidgetPosition, current.useTrueHUDWidgetPosition)) {
+	if (auto overridePosZ = ModAPIHandler::GetSingleton()->GetWidgetPosZ(ref, settings.useBTPSWidgetPosition, settings.useTrueHUDWidgetPosition)) {
 		pos.z = *overridePosZ;
-		offset = current.subtitleHeadOffset * 0.75f;
+		offset = settings.subtitleHeadOffset * 0.75f;
 	}
 
 	pos.z += offset * (height / 128.0f);
@@ -308,16 +352,16 @@ void Manager::Draw()
 		RE::BSSpinLockGuard gameLocker(subtitleManager->lock);
 		{
 			DualSubtitle::ScreenParams params;
-			params.spacing = current.subtitleSpacing;
-			params.alphaPrimary = current.subtitleAlphaPrimary;
-			params.alphaSecondary = current.subtitleAlphaSecondary;
+			params.spacing = settings.subtitleSpacing;
+			params.alphaPrimary = settings.subtitleAlphaPrimary;
+			params.alphaSecondary = settings.subtitleAlphaSecondary;
 
 			for (auto& subtitleInfo : subtitleArray | std::views::reverse) {  // reverse order so closer subtitles get rendered on top
-				if (subtitleInfo.isFlagSet(SubtitleFlag::kSkip) || subtitleInfo.isFlagSet(SubtitleFlag::kOffScreen)) {
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kSkip) || subtitleInfo.isFlagSet(SubtitleFlag::kOffscreen)) {
 					continue;
 				}
 
-				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && !current.fadeSubtitles) {
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && !settings.fadeSubtitles) {
 					continue;
 				}
 
@@ -327,7 +371,7 @@ void Manager::Draw()
 					continue;
 				}
 
-				auto alphaMult = std::bit_cast<float>(subtitleInfo.textAlpha());
+				auto alphaMult = std::bit_cast<float>(subtitleInfo.alphaModifier());
 				params.alphaPrimary *= alphaMult;
 				params.alphaSecondary *= alphaMult;
 

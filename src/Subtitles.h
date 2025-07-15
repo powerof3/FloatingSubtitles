@@ -18,9 +18,10 @@ struct Subtitle
 	Subtitle() = default;
 	Subtitle(const LocalizedSubtitle& a_subtitle);
 
-	void DrawSubtitle(float a_posX, float& a_posY, float a_alphaMult, float a_lineHeight) const;
+	void DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_lineHeight) const;
 
 	std::vector<Line> lines;
+	std::string       fullSubtitle;
 
 private:
 	static std::vector<Line> WrapText(const std::string& text, std::uint32_t maxWidth);
