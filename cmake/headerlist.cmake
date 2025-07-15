@@ -1,5 +1,6 @@
 set(headers ${headers}
 	src/API/BTPS_API_decl.h
+	src/API/NND_API.h
 	src/API/TrueHUDAPI.h
 	src/Compatibility.h
 	src/Hooks.h

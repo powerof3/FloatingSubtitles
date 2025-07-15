@@ -72,9 +72,9 @@ private:
 	std::string ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const;
 
 	// members
-	Language                       gameLanguage{ Language::kEnglish };
-	LanguageSetting                primaryLanguage{};
-	LanguageSetting                secondaryLanguage{};
-	SubtitleToIDMap                subtitleToID;
-	IDToSubtitleMap                idToSubtitle;
+	Language        gameLanguage{ Language::kEnglish };
+	LanguageSetting primaryLanguage{};
+	LanguageSetting secondaryLanguage{};
+	SubtitleToIDMap subtitleToID;
+	IDToSubtitleMap idToSubtitle;
 };
