@@ -373,14 +373,18 @@ void Manager::Draw()
 					continue;
 				}
 
-				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && settings.obscuredSubtitleAlpha == 0.0f) {
-					continue;
-				}
-
 				auto anchorPos = CalculateSubtitleAnchorPos(subtitleInfo);
 				auto zDepth = ImGui::WorldToScreenLoc(anchorPos, params.pos);
 				if (zDepth < 0.0f) {
 					continue;
+				}
+
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured)) {
+					if (settings.obscuredSubtitleAlpha == 0.0f) {
+						continue;
+					}
+					params.alphaPrimary *= settings.obscuredSubtitleAlpha;
+					params.alphaSecondary *= settings.obscuredSubtitleAlpha;
 				}
 
 				auto alphaMult = std::bit_cast<float>(subtitleInfo.alphaModifier());
