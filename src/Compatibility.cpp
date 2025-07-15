@@ -132,6 +132,7 @@ void ModAPIHandler::LoadAPIs()
 {
 	btps.GetAPI();
 	trueHUD.GetAPI();
+	nnd.GetAPI();
 }
 
 std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const
