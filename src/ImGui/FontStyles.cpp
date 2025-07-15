@@ -5,7 +5,7 @@
 
 namespace ImGui
 {
-	void Font::LoadFontSettings(CSimpleIniA& a_ini, const char* a_section)
+	void Font::LoadFontSettings(const CSimpleIniA& a_ini, const char* a_section)
 	{
 		name = a_ini.GetValue(a_section, "sFont", "");
 		name = R"(Data/Interface/ImGuiIcons/Fonts/)" + name;

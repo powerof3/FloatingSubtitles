@@ -23,9 +23,16 @@ public:
 	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
 
 private:
+	enum class OffscreenSubtitle
+	{
+		kDisabled = 0,
+		kSingle,
+		kDual
+	};
+
 	struct MCMSettings
 	{
-		std::pair<bool, bool> LoadMCMSettings(CSimpleIniA& a_ini);
+		std::pair<bool, bool> LoadMCMSettings(const CSimpleIniA& a_ini);
 
 		struct StoredSettings
 		{
@@ -34,19 +41,18 @@ private:
 			bool showDualSubs{ false };
 		};
 
-		StoredSettings previous{};
-		StoredSettings current{};
-		float          subtitleHeadOffset{ 15.0f };
-		float          subtitleSpacing{ 0.5f };
-		bool           useBTPSWidgetPosition{ true };
-		bool           useTrueHUDWidgetPosition{ true };
-		bool           doRayCastChecks{ true };
-		bool           fadeSubtitles{ true };
-		float          fadeSubtitleAlpha{ 0.35f };
-		float          subtitleAlphaPrimary{ 1.0f };
-		float          subtitleAlphaSecondary{ 1.0f };
-		bool           useOffscreenSubs;
-		std::uint32_t  maxOffscreenSubs{ 3 };
+		StoredSettings    previous{};
+		StoredSettings    current{};
+		float             subtitleHeadOffset{ 15.0f };
+		float             subtitleSpacing{ 0.5f };
+		bool              useBTPSWidgetPosition{ true };
+		bool              useTrueHUDWidgetPosition{ true };
+		bool              doRayCastChecks{ true };
+		float             obscuredSubtitleAlpha{ 0.35f };
+		float             subtitleAlphaPrimary{ 1.0f };
+		float             subtitleAlphaSecondary{ 1.0f };
+		OffscreenSubtitle offscreenSubs{ OffscreenSubtitle::kSingle };
+		std::uint32_t     maxOffscreenSubs{ 3 };
 	};
 
 	using SubtitleFlag = RE::SubtitleInfoEx::Flag;
@@ -71,8 +77,10 @@ private:
 	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
 	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 
-	void BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw);
+	void BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle);
 	void QueueOffscreenSubtitle() const;
+
+	void QueueDialogueSubtitle(const RE::BSString& a_subtitle) const;
 
 	// members
 	mutable RWLock                     subtitleLock;

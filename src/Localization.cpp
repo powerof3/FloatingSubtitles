@@ -206,29 +206,48 @@ void LocalizedSubtitles::BuildLocalizedSubtitles()
 	logger::info("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.duration(), subtitleToID.size());
 }
 
-LocalizedSubtitle LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const
+std::string LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const
 {
 	if (a_language == gameLanguage) {
-		return { a_localSubtitle, a_language.maxCharsPerLine };
+		return a_localSubtitle;
 	}
 
 	if (const auto idIt = subtitleToID.find(a_localSubtitle); idIt != subtitleToID.end()) {
 		if (const auto mapIt = idToSubtitle.find(idIt->second); mapIt != idToSubtitle.end()) {
 			if (const auto subtitleIt = mapIt->second.find(a_language.language); subtitleIt != mapIt->second.end()) {
-				return { subtitleIt->second, a_language.maxCharsPerLine };
+				return subtitleIt->second;
 			}
 		}
 	}
 
-	return { a_localSubtitle, a_language.maxCharsPerLine };
+	return a_localSubtitle;
 }
 
 LocalizedSubtitle LocalizedSubtitles::GetPrimarySubtitle(const char* a_localSubtitle) const
 {
-	return ResolveSubtitle(a_localSubtitle, primaryLanguage);
+	return { ResolveSubtitle(a_localSubtitle, primaryLanguage), primaryLanguage.maxCharsPerLine };
 }
 
 LocalizedSubtitle LocalizedSubtitles::GetSecondarySubtitle(const char* a_localSubtitle) const
 {
-	return ResolveSubtitle(a_localSubtitle, secondaryLanguage);
+	return { ResolveSubtitle(a_localSubtitle, secondaryLanguage), secondaryLanguage.maxCharsPerLine };
+}
+
+std::string LocalizedSubtitles::GetLocalizedSubtitleVanilla(const char* a_localSubtitle, bool a_dualSubtitles) const
+{
+	std::string localizedSub;
+
+	auto primarySub = ResolveSubtitle(a_localSubtitle, primaryLanguage);
+	if (RE::BSScaleformManager::GetSingleton()->IsValidName(primarySub.c_str())) {
+		localizedSub = primarySub;
+	}
+	if (a_dualSubtitles) {
+		auto secondarySub = ResolveSubtitle(a_localSubtitle, secondaryLanguage);
+		if (secondarySub != primarySub && RE::BSScaleformManager::GetSingleton()->IsValidName(secondarySub.c_str())) {
+			localizedSub.append("\n");
+			localizedSub.append(secondarySub);
+		}
+	}
+
+	return localizedSub.empty() ? a_localSubtitle : localizedSub;
 }

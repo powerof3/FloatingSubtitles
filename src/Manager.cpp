@@ -5,7 +5,7 @@
 #include "RayCaster.h"
 #include "SettingLoader.h"
 
-std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
+std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(const CSimpleIniA& a_ini)
 {
 	previous = current;
 
@@ -17,8 +17,7 @@ std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 
 	doRayCastChecks = a_ini.GetBoolValue("Settings", "bEnableRaycastChecks", doRayCastChecks);
 
-	fadeSubtitles = a_ini.GetBoolValue("Settings", "bFadeOutOfSightSubtitles", fadeSubtitles);
-	fadeSubtitleAlpha = static_cast<float>(a_ini.GetDoubleValue("Settings", "fFadedSubtitleOpacity", fadeSubtitleAlpha));
+	obscuredSubtitleAlpha = static_cast<float>(a_ini.GetDoubleValue("Settings", "fObscuredSubtitleOpacity", obscuredSubtitleAlpha));
 
 	subtitleSpacing = static_cast<float>(a_ini.GetDoubleValue("Settings", "fDualSubtitleSpacing", subtitleSpacing));
 
@@ -28,7 +27,7 @@ std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(CSimpleIniA& a_ini)
 	subtitleAlphaPrimary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaPrimary", subtitleAlphaPrimary));
 	subtitleAlphaSecondary = static_cast<float>(a_ini.GetDoubleValue("Settings", "fSubtitleAlphaSecondary", subtitleAlphaSecondary));
 
-	useOffscreenSubs = a_ini.GetBoolValue("Settings", "bEnableOffscreenSubtitles", useOffscreenSubs);
+	offscreenSubs = static_cast<OffscreenSubtitle>(a_ini.GetLongValue("Settings", "iOffscreenSubtitles", std::to_underlying(offscreenSubs)));
 	maxOffscreenSubs = a_ini.GetLongValue("Settings", "iMaxOffscreenSubtitles", maxOffscreenSubs);
 
 	return {
@@ -178,9 +177,7 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 	float alpha = 1.0f;
 
 	if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
-		if (settings.fadeSubtitles) {
-			alpha *= settings.fadeSubtitleAlpha;
-		}
+		alpha *= settings.obscuredSubtitleAlpha;
 	}
 
 	if (a_subInfo.targetDistance > maxDistanceStartSq) {
@@ -195,24 +192,28 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 	a_subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(alpha);
 }
 
-void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitleRaw)
+void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle)
 {
 	if (offscreenSubCount > settings.maxOffscreenSubs) {
 		return;
 	}
 
+	bool dualSubs = settings.offscreenSubs == OffscreenSubtitle::kDual;
+
+	auto localizedSub = localizedSubs.GetLocalizedSubtitleVanilla(a_subtitle.c_str(), dualSubs);
 	if (std::string name = ModAPIHandler::GetSingleton()->GetReferenceName(a_speaker); !name.empty()) {
-		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}\n", speakerColor, name, a_subtitleRaw.c_str()));
+		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColor, name, localizedSub));
 	} else {
-		offscreenSub.append(std::format("{}\n", a_subtitleRaw.c_str()));
+		offscreenSub.append(localizedSub);
 	}
+	offscreenSub.append(dualSubs ? "\n\n" : "\n");
 
 	offscreenSubCount++;
 }
 
 void Manager::QueueOffscreenSubtitle() const
 {
-	if (!settings.useOffscreenSubs) {
+	if (settings.offscreenSubs == OffscreenSubtitle::kDisabled) {
 		return;
 	}
 
@@ -233,6 +234,12 @@ void Manager::QueueOffscreenSubtitle() const
 			}
 		});
 	}
+}
+
+void Manager::QueueDialogueSubtitle(const RE::BSString& a_subtitle) const
+{
+	const std::string text = std::format("{}{}", localizedSubs.GetLocalizedSubtitleVanilla(a_subtitle.c_str(), settings.offscreenSubs == OffscreenSubtitle::kDual), objectTag);
+	RE::QueueDialogSubtitles(text.c_str());  // ShowDialogueText doesn't work?
 }
 
 void Manager::CalculateVisibility(RE::SubtitleInfoEx& a_subInfo)
@@ -288,8 +295,7 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 					if (!isDialogueSpeaker) {
 						BuildOffscreenSubtitle(ref, subtitleInfo.subtitle);
 					} else {
-						std::string text = std::format("{}{}", subtitleInfo.subtitle.c_str(), objectTag);
-						RE::QueueDialogSubtitles(text.c_str()); // ShowDialogueText doesn't work?
+						QueueDialogueSubtitle(subtitleInfo.subtitle);
 					}
 					continue;
 				}
@@ -361,7 +367,7 @@ void Manager::Draw()
 					continue;
 				}
 
-				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && !settings.fadeSubtitles) {
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && settings.obscuredSubtitleAlpha == 0.0f) {
 					continue;
 				}
 
