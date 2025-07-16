@@ -47,7 +47,7 @@ void ModAPIHandler::BTPS::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std::o
 		return;  // already set
 	}
 
-	if (api && api->GetWidget3DEnabled() && RE::IsCrosshairRef(a_ref)) {
+	if (api && api->GetWidget3DEnabled() && RE::IsCrosshairRef(a_ref) && !(RE::MenuTopicManager::GetSingleton()->menuOpen && RE::MenuTopicManager::GetSingleton()->speaker.get() == a_ref)) {
 		double x = 0.0;
 		double y = 0.0;
 		double z = 0.0;
