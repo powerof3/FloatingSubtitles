@@ -156,6 +156,7 @@ void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle
 			if (!subtitleArray.empty()) {
 				auto& subInfo = subtitleArray.back();
 				subInfo.flagsRaw() = 0;  // reset any junk values
+				subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(1.0f);
 			}
 		}
 	}
@@ -306,8 +307,8 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 					continue;
 				}
 
-				CalculateAlphaModifier(subtitleInfo);
 				CalculateVisibility(subtitleInfo);
+				CalculateAlphaModifier(subtitleInfo);
 			}
 		}
 
@@ -373,18 +374,14 @@ void Manager::Draw()
 					continue;
 				}
 
+				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured) && settings.obscuredSubtitleAlpha == 0.0f) {
+					continue;
+				}
+
 				auto anchorPos = CalculateSubtitleAnchorPos(subtitleInfo);
 				auto zDepth = ImGui::WorldToScreenLoc(anchorPos, params.pos);
 				if (zDepth < 0.0f) {
 					continue;
-				}
-
-				if (subtitleInfo.isFlagSet(SubtitleFlag::kObscured)) {
-					if (settings.obscuredSubtitleAlpha == 0.0f) {
-						continue;
-					}
-					params.alphaPrimary *= settings.obscuredSubtitleAlpha;
-					params.alphaSecondary *= settings.obscuredSubtitleAlpha;
 				}
 
 				auto alphaMult = std::bit_cast<float>(subtitleInfo.alphaModifier());

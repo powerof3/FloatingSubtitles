@@ -28,6 +28,8 @@ private:
 	static std::vector<Line> WrapText(const LocalizedSubtitle& a_subtitle);
 	static void              WrapCJKText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
 	static void              WrapLatinText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
+	static std::uint8_t      GetUTF8CharLength(const std::string& str, std::size_t pos);
+	static bool              IsTextCJK(const std::string& str);
 };
 
 struct DualSubtitle
