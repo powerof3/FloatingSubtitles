@@ -4,7 +4,10 @@
 #include "RE.h"
 #include "Subtitles.h"
 
-class Manager : public REX::Singleton<Manager>
+class Manager :
+	public REX::Singleton<Manager>,
+	public RE::BSTEventSink<RE::MenuOpenCloseEvent>
+
 {
 public:
 	void OnDataLoaded();
@@ -82,6 +85,8 @@ private:
 	void        QueueOffscreenSubtitle() const;
 	void        QueueDialogueSubtitle(const RE::BSString& a_subtitle);
 
+	RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
+
 	// members
 	mutable RWLock                     subtitleLock;
 	FlatMap<std::string, DualSubtitle> processedSubtitles;
@@ -93,6 +98,8 @@ private:
 	LocalizedSubtitles                 localizedSubs;
 	std::string                        offscreenSub{};
 	std::string                        lastOffscreenSub{};
+	std::string                        talkingActivatorSub{};
+	std::string                        lasttalkingActivatorSub{};
 	std::uint32_t                      offscreenSubCount{ 0 };
 
 	static constexpr std::string_view objectTag{ "[REF]" };

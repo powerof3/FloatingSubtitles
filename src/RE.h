@@ -55,9 +55,8 @@ namespace RE
 		enum class Flag : std::uint8_t
 		{
 			kNone = 0,
-			kSkip = 1 << 0,
-			kOffscreen = 1 << 1,
-			kObscured = 1 << 2
+			kOffscreen = 1 << 0,
+			kObscured = 1 << 1
 		};
 
 		std::uint32_t& alphaModifier() { return pad04; }
