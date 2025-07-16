@@ -59,8 +59,6 @@ void Manager::LoadMCMSettings()
 
 void Manager::OnDataLoaded()
 {
-	RE::UI::GetSingleton()->AddEventSink(this);
-
 	localizedSubs.BuildLocalizedSubtitles();
 
 	LoadMCMSettings();
@@ -160,6 +158,12 @@ void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle
 				auto& subInfo = subtitleArray.back();
 				subInfo.flagsRaw() = 0;  // reset any junk values
 				subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(1.0f);
+				subInfo.setFlag(RE::SubtitleInfoEx::Flag::kInitialized, true);
+				if (const auto ref = subInfo.speaker.get()) {
+					if (!ref->IsActor()) {
+						subInfo.subtitle = std::format("{}{}", a_subtitle, objectTag);
+					}
+				}
 			}
 		}
 	}
@@ -246,24 +250,6 @@ void Manager::QueueOffscreenSubtitle() const
 	}
 }
 
-void Manager::QueueDialogueSubtitle(const RE::BSString& a_subtitle)
-{
-	talkingActivatorSub = std::format("{}{}", GetScaleformSubtitle(a_subtitle.c_str()), objectTag);
-	if (talkingActivatorSub != lasttalkingActivatorSub) {
-		RE::QueueDialogSubtitles(talkingActivatorSub.c_str());
-	}
-}
-
-RE::BSEventNotifyControl Manager::ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*)
-{
-	if (a_event->menuName == RE::DialogueMenu::MENU_NAME && !a_event->opening) {
-		talkingActivatorSub.clear();
-		lasttalkingActivatorSub.clear();
-	}
-
-	return RE::BSEventNotifyControl::kContinue;
-}
-
 void Manager::CalculateVisibility(RE::SubtitleInfoEx& a_subInfo)
 {
 	const auto ref = a_subInfo.speaker.get();
@@ -310,10 +296,13 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 		offscreenSub.clear();
 		offscreenSubCount = 0;
 
-		lasttalkingActivatorSub = talkingActivatorSub;
-		talkingActivatorSub.clear();
-
 		for (auto& subtitleInfo : subtitleArray) {
+			if (!subtitleInfo.isFlagSet(RE::SubtitleInfoEx::Flag::kInitialized)) {
+				subtitleInfo.flagsRaw() = 0;
+				subtitleInfo.alphaModifier() = std::bit_cast<std::uint32_t>(1.0f);
+				subtitleInfo.setFlag(RE::SubtitleInfoEx::Flag::kInitialized, true);
+			}
+
 			if (const auto& ref = subtitleInfo.speaker.get()) {
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subtitleInfo.speaker);
 
@@ -324,9 +313,6 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 				}
 
 				if (!ref->IsActor()) {
-					if (isDialogueSpeaker && showDialogue) {
-						QueueDialogueSubtitle(subtitleInfo.subtitle);
-					}
 					continue;
 				}
 
