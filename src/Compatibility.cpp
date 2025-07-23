@@ -133,6 +133,9 @@ void ModAPIHandler::LoadAPIs()
 	btps.GetAPI();
 	trueHUD.GetAPI();
 	nnd.GetAPI();
+
+	altCCInstalled = GetModuleHandle(L"AlternateConversationCamera.dll");
+	logger::info("Alternate Conversation Camera: {}", altCCInstalled ? "Loaded" : "Not loaded");
 }
 
 std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const

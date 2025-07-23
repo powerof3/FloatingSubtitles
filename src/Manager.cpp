@@ -109,7 +109,7 @@ bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
 
 bool Manager::ShowDialogueSubtitles() const
 {
-	return RE::ShowDialogueSubsGame() && settings.current.showDialogueSubtitles;
+	return RE::ShowDialogueSubsGame() && settings.current.showDialogueSubtitles && !ModAPIHandler::GetSingleton()->ACCInstalled();
 }
 
 DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
