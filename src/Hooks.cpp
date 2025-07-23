@@ -34,7 +34,7 @@ namespace Hooks
 				switch (hudData->type.get()) {
 				case RE::HUD_MESSAGE_TYPE::kShowSubtitle:
 					{
-						if (Manager::GetSingleton()->ShowGeneralSubtitles()) {
+						if (Manager::GetSingleton()->HandlesGeneralSubtitles(hudData->text)) {
 							return RE::UI_MESSAGE_RESULTS::kIgnore;
 						}
 					}

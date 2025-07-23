@@ -17,9 +17,7 @@ public:
 
 	void SetVisible(bool a_visible);
 
-	bool ShowGeneralSubtitles() const;
-	bool ShowDialogueSubtitles() const;
-
+	bool HandlesGeneralSubtitles(RE::BSString& a_text) const;
 	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
 
 private:
@@ -64,6 +62,9 @@ private:
 	bool IsVisible() const;
 
 	static bool HasObjectTag(RE::BSString& a_text);
+
+	bool ShowGeneralSubtitles() const;
+	bool ShowDialogueSubtitles() const;
 
 	DualSubtitle CreateDualSubtitles(const char* subtitle) const;
 
