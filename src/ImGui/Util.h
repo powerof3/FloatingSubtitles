@@ -7,6 +7,8 @@
 
 namespace ImGui
 {
+	ImU32 GetColorU32(const ImVec4& col, float alpha_mul);
+
 	float WorldToScreenLoc(const RE::NiPoint3& worldLocIn, ImVec2& screenLocOut);
 
 	void DrawCircle(const RE::NiPoint3& a_pos, float radius, ImU32 color = IM_COL32_WHITE);

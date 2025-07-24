@@ -2,6 +2,7 @@
 
 #include "Compatibility.h"
 #include "SettingLoader.h"
+#include "Util.h"
 
 namespace ImGui
 {
@@ -52,7 +53,7 @@ namespace ImGui
 	StyleParams FontStyles::GetStyleParams(float alpha) const
 	{
 		const ImU32  textColor = ImGui::GetColorU32(ImGuiCol_Text, alpha);
-		const ImU32  shadowColor = ImGui::ColorConvertFloat4ToU32(ImVec4(user.shadowText.x, user.shadowText.y, user.shadowText.z, alpha));
+		const ImU32  shadowColor = ImGui::GetColorU32(user.shadowText, alpha);
 		const ImVec2 shadowOffset = user.shadowOffset;
 
 		return { textColor, shadowColor, shadowOffset };

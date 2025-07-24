@@ -2,6 +2,14 @@
 
 namespace ImGui
 {
+	ImU32 GetColorU32(const ImVec4& col, float alpha_mul)
+	{
+		ImGuiStyle& style = GImGui->Style;
+		ImVec4      c = col;
+		c.w *= style.Alpha * alpha_mul;
+		return ColorConvertFloat4ToU32(c);
+	}
+
 	float WorldToScreenLoc(const RE::NiPoint3& worldLocIn, ImVec2& screenLocOut)
 	{
 		float zVal;
