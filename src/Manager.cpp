@@ -82,7 +82,6 @@ void Manager::SetVisible(bool a_visible)
 	visible = a_visible;
 }
 
-
 bool Manager::HasObjectTag(RE::BSString& a_text)
 {
 	std::string text = a_text.c_str();
