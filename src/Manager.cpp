@@ -199,7 +199,12 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 
 	if (a_subInfo.targetDistance > maxDistanceStartSq) {
 		const float t = (a_subInfo.targetDistance - maxDistanceStartSq) / (maxDistanceEndSq - maxDistanceStartSq);
-		alpha *= 1.0f - glm::cubicEaseOut(t);
+
+		constexpr auto cubicEaseOut = [](float t) -> float {
+			return 1.0f - (t * t * t);
+		};
+
+		alpha *= 1.0f - cubicEaseOut(t);
 	} else if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
 		alpha *= high->fadeAlpha;
 	} else if (actor->IsDead() && actor->voiceTimer < 1.0f) {

@@ -8,7 +8,6 @@
     "boost-unordered",
     "clib-util",
     "freetype",
-    "glm",
     {
       "name": "imgui",
       "features": [ "dx11-binding", "win32-binding", "freetype", "wchar32" ]

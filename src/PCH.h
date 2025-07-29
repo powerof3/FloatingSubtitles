@@ -17,22 +17,11 @@
 #include <ClibUtil/string.hpp>
 #include <ClibUtil/timer.hpp>
 
-#include <boost/unordered/unordered_flat_map.hpp>
-#include <boost/unordered/unordered_flat_set.hpp>
+#include <boost_unordered.hpp>
 #include <freetype/freetype.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <srell.hpp>
 #include <xbyak/xbyak.h>
-
-#define GLM_FORCE_INLINE
-#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
-#define GLM_FORCE_INTRINSICS
-#define GLM_FORCE_LEFT_HANDED
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_FORCE_QUAT_DATA_WXYZ
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/easing.hpp>
 
 #include "imgui_impl_win32.h"
 #include "imgui_internal.h"
