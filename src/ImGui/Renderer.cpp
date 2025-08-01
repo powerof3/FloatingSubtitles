@@ -5,20 +5,6 @@
 
 namespace ImGui::Renderer
 {
-	struct WndProc
-	{
-		static LRESULT thunk(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-		{
-			auto& io = ImGui::GetIO();
-			if (uMsg == WM_KILLFOCUS) {
-				io.ClearInputKeys();
-			}
-
-			return func(hWnd, uMsg, wParam, lParam);
-		}
-		static inline WNDPROC func;
-	};
-
 	struct CreateD3DAndSwapChain
 	{
 		static void thunk()
@@ -62,15 +48,6 @@ namespace ImGui::Renderer
 				logger::info("ImGui initialized.");
 
 				initialized.store(true);
-
-				WndProc::func = reinterpret_cast<WNDPROC>(
-					SetWindowLongPtrA(
-						desc.OutputWindow,
-						GWLP_WNDPROC,
-						reinterpret_cast<LONG_PTR>(WndProc::thunk)));
-				if (!WndProc::func) {
-					logger::error("SetWindowLongPtrA failed!");
-				}
 			}
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
@@ -82,8 +59,9 @@ namespace ImGui::Renderer
 		static void thunk(RE::IMenu* a_menu)
 		{
 			// Skip if Imgui is not loaded
-			if (!initialized.load()) {
-				return func(a_menu);
+			if (!initialized.load() || Manager::GetSingleton()->SkipRender()) {
+				func(a_menu);
+				return;
 			}
 
 			ImGui_ImplDX11_NewFrame();
@@ -119,10 +97,5 @@ namespace ImGui::Renderer
 		stl::write_thunk_call<CreateD3DAndSwapChain>(target.address());
 
 		stl::write_vfunc<RE::HUDMenu, PostDisplay>();
-	}
-
-	void RenderMenus(bool a_render)
-	{
-		renderMenus = a_render;
 	}
 }

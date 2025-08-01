@@ -10,12 +10,12 @@ public:
 	void OnDataLoaded();
 	void LoadMCMSettings();
 
+	bool SkipRender() const;
 	void Draw();
+	void SetVisible(bool a_visible);
 
 	void AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle);
 	void UpdateSubtitleInfo(RE::SubtitleManager* a_manager);
-
-	void SetVisible(bool a_visible);
 
 	bool HandlesGeneralSubtitles(RE::BSString& a_text) const;
 	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
@@ -58,8 +58,6 @@ private:
 	using RWLock = std::shared_mutex;
 	using ReadLocker = std::shared_lock<RWLock>;
 	using WriteLocker = std::unique_lock<RWLock>;
-
-	bool IsVisible() const;
 
 	static bool HasObjectTag(RE::BSString& a_text);
 
