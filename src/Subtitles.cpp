@@ -215,7 +215,6 @@ void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, 
 				std::string mainWord = punctMatch[1].str();
 				std::string punct = punctMatch[2].str();
 
-
 				add_word(mainWord, wordHasDragonFont);
 				add_word(punct, false);
 			} else {
@@ -244,7 +243,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 		std::string prefix = match.prefix().str();
 		if (!prefix.empty()) {
 			for (auto it = srell::sregex_iterator(prefix.begin(), prefix.end(), re);
-				it != srell::sregex_iterator(); ++it) {
+				 it != srell::sregex_iterator(); ++it) {
 				result.push_back(it->str());
 			}
 		}
@@ -256,7 +255,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 
 	if (!remaining.empty()) {
 		for (auto it = srell::sregex_iterator(remaining.begin(), remaining.end(), re);
-			it != srell::sregex_iterator(); ++it) {
+			 it != srell::sregex_iterator(); ++it) {
 			result.push_back(it->str());
 		}
 	}

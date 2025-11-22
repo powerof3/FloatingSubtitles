@@ -405,13 +405,13 @@ void Manager::Draw()
 				}
 
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subInfo.speaker);
-				
+
 				if ((isDialogueSpeaker && !showDialogue) ||
 					(!isDialogueSpeaker && !showGeneral) ||
 					!subInfo.forceDisplay && subInfo.targetDistance > maxDistanceEndSq) {
 					continue;
 				}
-				
+
 				if (subInfo.isFlagSet(SubtitleFlag::kOffscreen) || subInfo.isFlagSet(SubtitleFlag::kObscured) && settings.obscuredSubtitleAlpha == 0.0f) {
 					continue;
 				}
