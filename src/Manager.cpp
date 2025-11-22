@@ -197,6 +197,10 @@ void Manager::RebuildProcessedSubtitles()
 
 void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 {
+	if (a_subInfo.isFlagSet(SubtitleFlag::kOffscreen)) {
+		return;
+	}
+	
 	const auto ref = a_subInfo.speaker.get();
 	const auto actor = ref->As<RE::Actor>();
 
@@ -334,6 +338,13 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 
 				if (!ref->IsActor()) {
 					continue;
+				}
+
+				if (ref->IsPlayerRef()) {
+					if (auto pcCamera = RE::PlayerCamera::GetSingleton(); pcCamera && pcCamera->IsInFirstPerson()) {
+						BuildOffscreenSubtitle(ref, subInfo.subtitle);
+						continue;
+					}
 				}
 
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subInfo.speaker);
