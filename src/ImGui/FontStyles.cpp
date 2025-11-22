@@ -9,7 +9,6 @@ namespace ImGui
 	void Font::LoadFontSettings(const CSimpleIniA& a_ini, const char* a_section)
 	{
 		name = a_ini.GetValue(a_section, "sFont", "");
-		name = R"(Data/Interface/ImGuiIcons/Fonts/)" + name;
 
 		const auto resolutionScale = ModAPIHandler::GetSingleton()->GetResolutionScale();
 		size = std::roundf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
@@ -20,6 +19,13 @@ namespace ImGui
 	void Font::LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges)
 	{
 		if (name.empty() || font) {
+			return;
+		}
+
+		name = R"(Data\Interface\ImGuiIcons\Fonts\)" + name;
+
+		std::error_code ec;
+		if (!std::filesystem::exists(name, ec)) {
 			return;
 		}
 
@@ -34,6 +40,13 @@ namespace ImGui
 		primaryFont.LoadFont(config);
 		config.MergeMode = true;
 		secondaryFont.LoadFont(config);
+		config.MergeMode = false;
+		dragonFont.LoadFont(config);
+	}
+
+	void FontStyles::PushDragonFont()
+	{
+		dragonFont.PushFont();
 	}
 
 	void FontStyles::LoadStyleSettings(CSimpleIniA& a_ini)
@@ -50,35 +63,26 @@ namespace ImGui
 #undef GET_VALUE
 	}
 
-	StyleParams FontStyles::GetStyleParams(float alpha) const
-	{
-		const ImU32  textColor = ImGui::GetColorU32(ImGuiCol_Text, alpha);
-		const ImU32  shadowColor = ImGui::GetColorU32(user.shadowText, alpha);
-		const ImVec2 shadowOffset = user.shadowOffset;
-
-		return { textColor, shadowColor, shadowOffset };
-	}
-
 	void FontStyles::LoadFontStyles()
 	{
 		// load style
 		SettingLoader::GetSingleton()->Load(FileType::kStyles, [&](auto& ini) { LoadStyleSettings(ini); });
 
-		ImGuiStyle style;
-		auto&      colors = style.Colors;
+		auto& style = GetStyle();
+		auto& colors = style.Colors;
 
 		colors[ImGuiCol_Text] = user.text;
-		user.shadowOffset = ImVec2(user.shadowOffsetVar, user.shadowOffsetVar);
-
-		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
-
-		GetStyle() = style;
+		style.Colors[ImGuiCol_TextShadowDisabled] = user.shadowText;
+		style.TextShadowOffset = ImVec2(1.50f, 1.50f);
 
 		// load fonts
 		SettingLoader::GetSingleton()->Load(FileType::kFonts, [&](auto& ini) {
 			primaryFont.LoadFontSettings(ini, "PrimaryFont");
 			secondaryFont.LoadFontSettings(ini, "SecondaryFont");
+			dragonFont.LoadFontSettings(ini, "DragonFont");
 		});
+
+		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
 
 		LoadFonts();
 	}

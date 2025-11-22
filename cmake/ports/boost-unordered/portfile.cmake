@@ -2,8 +2,8 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO MikePopoloski/boost_unordered
-    REF d6db3d2473cda6a2db13745428611d5ee36dc318
-    SHA512 03102c5d5e14bb4effb60cdcd83a77f41cc21dbbf45b02b430cb276d0fdcbf271be044a90aa5d248261b8ee1ea7ac5ec0699dc1dbb7bb96f8d9cd47c1bd053e7
+    REF 375337252b02bf99d2bd9280a9cefcdf0bfbab01
+    SHA512 4c4e5406cf38e49da6ac873bde7e2645447bac5f886e3e941f4a70e60b4fb6eb1b75a43f4254e6983722166ee363ec28612c31d2c2f3e9250435f2851cf121db
     HEAD_REF master
 )
 

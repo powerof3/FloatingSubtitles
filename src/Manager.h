@@ -41,6 +41,7 @@ private:
 
 		StoredSettings    previous{};
 		StoredSettings    current{};
+		bool              showSpeakerName{ false };
 		float             subtitleHeadOffset{ 15.0f };
 		float             subtitleSpacing{ 0.5f };
 		bool              useBTPSWidgetPosition{ true };
@@ -86,7 +87,8 @@ private:
 	MCMSettings                        settings;
 	float                              maxDistanceStartSq{ 4194304.0f };
 	float                              maxDistanceEndSq{ 4624220.16f };
-	std::int32_t                       speakerColor{};
+	ImU32                              speakerColorU32{};
+	ImVec4                             speakerColorFloat4{};
 	bool                               visible{ true };
 	LocalizedSubtitles                 localizedSubs;
 	std::string                        offscreenSub{};

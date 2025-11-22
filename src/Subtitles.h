@@ -9,10 +9,17 @@ namespace ImGui
 
 struct Subtitle
 {
+	struct Word
+	{
+		std::string word;
+		ImVec2      size;
+		bool        isDragonFont;
+	};
+
 	struct Line
 	{
-		std::string line;
-		ImVec2      lineSize;
+		std::vector<Word> words;
+		float             sizeX;
 	};
 
 	Subtitle() = default;
@@ -25,21 +32,24 @@ struct Subtitle
 	bool              validForScaleform{ false };
 
 private:
-	static std::vector<Line> WrapText(const LocalizedSubtitle& a_subtitle);
-	static void              WrapCJKText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
-	static void              WrapLatinText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
-	static std::uint8_t      GetUTF8CharLength(const std::string& str, std::size_t pos);
-	static bool              IsTextCJK(const std::string& str);
+	static std::vector<Line>        WrapText(const LocalizedSubtitle& a_subtitle);
+	static void                     WrapCJKText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
+	static void                     WrapLatinText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth);
+	static std::uint8_t             GetUTF8CharLength(const std::string& str, std::size_t pos);
+	static bool                     IsTextCJK(const std::string& str);
+	static std::vector<std::string> SplitText(const std::string& a_text);
 };
 
 struct DualSubtitle
 {
 	struct ScreenParams
 	{
-		ImVec2 pos{};
-		float  alphaPrimary{ 1.0f };
-		float  alphaSecondary{ 1.0f };
-		float  spacing{ 0.5f };
+		ImVec2      pos{};
+		float       alphaPrimary{ 1.0f };
+		float       alphaSecondary{ 1.0f };
+		float       spacing{ 0.5f };
+		std::string speakerName{};
+		ImVec4      speakerColor;
 	};
 
 	DualSubtitle() = default;

@@ -32,6 +32,15 @@
           "type": "empty"
         },
         {
+          "id": "bShowSpeakerName:Settings",
+          "text": "$FSUB_ShowSpeakerName_Text",
+          "type": "toggle",
+          "help": "$FSUB_ShowSpeakerName_Help",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
           "id": "fHeadOffset:Settings",
           "text": "$FSUB_SubtitleHeadOffset_Text",
           "type": "slider",
@@ -190,6 +199,7 @@
           "text": "$FSUB_DualSubtitleSpacing_Text",
           "type": "slider",
           "help": "$FSUB_DualSubtitleSpacing_Help",
+          "groupCondition": 3,
           "valueOptions": {
             "sourceType": "ModSettingFloat",
             "min": 0.0,

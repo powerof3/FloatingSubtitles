@@ -190,7 +190,7 @@ void LocalizedSubtitles::MergeDuplicateSubtitles(const MultiSubtitleToIDMap& a_m
 
 void LocalizedSubtitles::BuildLocalizedSubtitles()
 {
-	gameLanguage = to_language(RE::GetINISetting<std::string>("sLanguage:General"));
+	gameLanguage = to_language("sLanguage:General"_ini.value());
 
 	Timer timer;
 	timer.start();
@@ -201,7 +201,7 @@ void LocalizedSubtitles::BuildLocalizedSubtitles()
 	ReadILStringFiles(multiSubtitleToID, multiIDToSubtitle);
 	MergeDuplicateSubtitles(multiSubtitleToID, multiIDToSubtitle);
 
-	timer.end();
+	timer.stop();
 
 	logger::info("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.duration(), subtitleToID.size());
 }

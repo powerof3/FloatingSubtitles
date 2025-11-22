@@ -3,9 +3,9 @@ vcpkg_check_linkage(ONLY_STATIC_LIBRARY)
 vcpkg_from_github(
 OUT_SOURCE_PATH SOURCE_PATH
 REPO powerof3/imgui
-REF 0d6764ff742f8ef205a5bbebd905c0ff5b00c3df
-SHA512 611c7328b57a6286c1478d5f2b2cc2dae0fc5791b74090c7b1a7579b5b2afa9c317f7273d053231c395f8decc2fccb0c525977f944e81aa5c8b2f558ddeb6a05
-HEAD_REF features/precisetextrendering
+REF d7645d94fdc1a6e25a359f7a3382989ff48f8a1b
+SHA512 675fe8ce51b8733520795ab88723de866961c52c7c6e75b518267539789eb64850e3dde0f1bec3c8a45b7f3c08af05f4a5e9dfd2d678af20f6470b1af192902b
+HEAD_REF features/precisetextshadows
 )
 
 file(COPY "${CMAKE_CURRENT_LIST_DIR}/imgui-config.cmake.in" DESTINATION "${SOURCE_PATH}")

@@ -3,9 +3,14 @@
 namespace ImGui
 {
 	struct Font
-	{
+	{	
 		void LoadFontSettings(const CSimpleIniA& a_ini, const char* a_section);
 		void LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges = nullptr);
+
+		void PushFont() const
+		{
+			ImGui::PushFont(font, size);
+		}
 
 		std::string name{ "Jost-Medium.ttf" };
 		float       size{ 35.0f };
@@ -22,13 +27,6 @@ namespace ImGui
 		float  shadowOffsetVar{ 3.0f };
 	};
 
-	struct StyleParams
-	{
-		ImU32  textColor;
-		ImU32  shadowColor;
-		ImVec2 shadowOffset;
-	};
-
 	class FontStyles : public REX::Singleton<FontStyles>
 	{
 	public:
@@ -37,7 +35,7 @@ namespace ImGui
 
 		void LoadFonts();
 
-		StyleParams GetStyleParams(float alpha) const;
+		void PushDragonFont();
 
 	private:
 		template <class T>
@@ -51,6 +49,7 @@ namespace ImGui
 
 		Font primaryFont{};
 		Font secondaryFont{};
+		Font dragonFont{};
 
 		static FontStyles instance;
 	};

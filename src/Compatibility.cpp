@@ -120,7 +120,7 @@ std::string ModAPIHandler::NND::GetReferenceName(const RE::TESObjectREFRPtr& a_r
 		}
 	}
 
-	return a_ref->GetDisplayFullName();
+	return RE::GetSpeakerName(a_ref);
 }
 
 void ModAPIHandler::LoadModSettings()

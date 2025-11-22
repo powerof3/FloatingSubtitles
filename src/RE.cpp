@@ -82,16 +82,6 @@ namespace RE
 		return func(a_text);
 	}
 
-	bool ShowGeneralSubsGame()
-	{
-		return GetINIPrefsSetting<bool>("bGeneralSubtitles:Interface");
-	}
-
-	bool ShowDialogueSubsGame()
-	{
-		return GetINIPrefsSetting<bool>("bDialogueSubtitles:Interface");
-	}
-
 	void SendHUDMenuMessage(HUD_MESSAGE_TYPE a_type, const std::string& a_text, bool a_show)
 	{
 		if (auto hudData = static_cast<HUDData*>(UIMessageQueue::GetSingleton()->CreateUIMessageData(InterfaceStrings::GetSingleton()->hudData))) {
@@ -100,5 +90,24 @@ namespace RE
 			hudData->text = a_text;
 			UIMessageQueue::GetSingleton()->AddMessage(InterfaceStrings::GetSingleton()->hudMenu, UI_MESSAGE_TYPE::kUpdate, hudData);
 		}
+	}
+
+	const char* GetSpeakerName(const RE::TESObjectREFRPtr& a_ref)
+	{
+		if (!a_ref->IsActor() || a_ref->extraList.HasType<ExtraTextDisplayData>()) {
+			return a_ref->GetDisplayFullName();
+		} else {
+			if (auto speakerActor = a_ref->As<Actor>()) {
+				if (auto speakerNPC = static_cast<TESNPC*>(speakerActor->GetObjectReference())) {
+					const auto& name = speakerNPC->shortName;
+					if (name.empty()) {
+						return speakerNPC->GetFullName();
+					} else {
+						return name.c_str();
+					}
+				}
+			}
+		}
+		return nullptr;
 	}
 }

@@ -13,6 +13,8 @@ std::pair<bool, bool> Manager::MCMSettings::LoadMCMSettings(const CSimpleIniA& a
 	current.showDialogueSubtitles = a_ini.GetBoolValue("Settings", "bDialogueSubtitles", current.showDialogueSubtitles);
 	current.showDualSubs = a_ini.GetBoolValue("Settings", "bDualSubtitles", current.showDualSubs);
 
+	showSpeakerName = a_ini.GetBoolValue("Settings", "bShowSpeakerName", showSpeakerName);
+
 	subtitleHeadOffset = static_cast<float>(a_ini.GetDoubleValue("Settings", "fHeadOffset", 20.0)) * ModAPIHandler::GetSingleton()->GetResolutionScale();
 
 	doRayCastChecks = a_ini.GetBoolValue("Settings", "bEnableRaycastChecks", doRayCastChecks);
@@ -63,13 +65,17 @@ void Manager::OnDataLoaded()
 
 	LoadMCMSettings();
 
-	const auto gameMaxDistance = RE::GetINISetting<float>("fMaxSubtitleDistance:Interface");
+	const auto gameMaxDistance = "fMaxSubtitleDistance:Interface"_ini.value();
 	maxDistanceStartSq = gameMaxDistance * gameMaxDistance;
 	maxDistanceEndSq = (gameMaxDistance * 1.05f) * (gameMaxDistance * 1.05f);
 
 	logger::info("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
 
-	speakerColor = RE::GetINISetting<std::int32_t>("iSubtitleSpeakerNameColor:Interface");
+	speakerColorU32 = "iSubtitleSpeakerNameColor:Interface"_ini.value();
+	speakerColorFloat4 = ImGui::ColorConvertU32ToFloat4(speakerColorU32);
+	speakerColorFloat4.w = 1.0f;
+
+	logger::info("Subtitle speaker color: {},{},{} ({:X})", speakerColorFloat4.x, speakerColorFloat4.y, speakerColorFloat4.z, speakerColorU32);
 }
 
 bool Manager::SkipRender() const
@@ -107,7 +113,7 @@ bool Manager::HandlesGeneralSubtitles(RE::BSString& a_text) const
 
 bool Manager::ShowGeneralSubtitles() const
 {
-	return RE::ShowGeneralSubsGame() && settings.current.showGeneralSubtitles;
+	return "bGeneralSubtitles:Interface"_pref.value() && settings.current.showGeneralSubtitles;
 }
 
 bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
@@ -121,7 +127,7 @@ bool Manager::HandlesDialogueSubtitles(RE::BSString* a_text) const
 
 bool Manager::ShowDialogueSubtitles() const
 {
-	return RE::ShowDialogueSubsGame() && settings.current.showDialogueSubtitles && !ModAPIHandler::GetSingleton()->ACCInstalled();
+	return "bDialogueSubtitles:Interface"_pref.value() && settings.current.showDialogueSubtitles && !ModAPIHandler::GetSingleton()->ACCInstalled();
 }
 
 DualSubtitle Manager::CreateDualSubtitles(const char* subtitle) const
@@ -233,7 +239,7 @@ void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, cons
 
 	auto scaleformSub = GetScaleformSubtitle(a_subtitle);
 	if (std::string name = ModAPIHandler::GetSingleton()->GetReferenceName(a_speaker); !name.empty()) {
-		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColor, name, scaleformSub));
+		offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColorU32, name, scaleformSub));
 	} else {
 		offscreenSub.append(scaleformSub);
 	}
@@ -315,7 +321,7 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 
 		for (auto& subInfo : subtitleArray) {
 			if (const auto& ref = subInfo.speaker.get()) {
-				if (!subInfo.isFlagSet(RE::SubtitleInfoEx::Flag::kInitialized)) {
+				if (!subInfo.isFlagSet(SubtitleFlag::kInitialized)) {
 					subInfo.flagsRaw() = 0;
 					subInfo.alphaModifier() = std::bit_cast<std::uint32_t>(1.0f);
 					if (!ref->IsActor()) {
@@ -323,7 +329,11 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 							subInfo.subtitle = std::format("{}{}", text, objectTag);
 						}
 					}
-					subInfo.setFlag(RE::SubtitleInfoEx::Flag::kInitialized, true);
+					subInfo.setFlag(SubtitleFlag::kInitialized, true);
+				}
+
+				if (!ref->IsActor()) {
+					continue;
 				}
 
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subInfo.speaker);
@@ -331,10 +341,6 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 				if ((isDialogueSpeaker && !showDialogue) ||
 					(!isDialogueSpeaker && !showGeneral) ||
 					!subInfo.forceDisplay && subInfo.targetDistance > maxDistanceEndSq) {
-					continue;
-				}
-
-				if (!ref->IsActor()) {
 					continue;
 				}
 
@@ -388,6 +394,7 @@ void Manager::Draw()
 	{
 		DualSubtitle::ScreenParams params;
 		params.spacing = settings.subtitleSpacing;
+		params.speakerColor = speakerColorFloat4;
 
 		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(subtitleManager->subtitles);
 
@@ -398,13 +405,13 @@ void Manager::Draw()
 				}
 
 				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subInfo.speaker);
-
+				
 				if ((isDialogueSpeaker && !showDialogue) ||
 					(!isDialogueSpeaker && !showGeneral) ||
 					!subInfo.forceDisplay && subInfo.targetDistance > maxDistanceEndSq) {
 					continue;
 				}
-
+				
 				if (subInfo.isFlagSet(SubtitleFlag::kOffscreen) || subInfo.isFlagSet(SubtitleFlag::kObscured) && settings.obscuredSubtitleAlpha == 0.0f) {
 					continue;
 				}
@@ -418,6 +425,11 @@ void Manager::Draw()
 				auto alphaMult = std::bit_cast<float>(subInfo.alphaModifier());
 				params.alphaPrimary = settings.subtitleAlphaPrimary * alphaMult;
 				params.alphaSecondary = settings.subtitleAlphaSecondary * alphaMult;
+				if (settings.showSpeakerName && !RE::IsCrosshairRef(ref)) {
+					params.speakerName = ModAPIHandler::GetSingleton()->GetReferenceName(ref);
+				} else {
+					params.speakerName.clear();
+				}
 
 				GetProcessedSubtitle(subInfo.subtitle).DrawDualSubtitle(params);
 			}

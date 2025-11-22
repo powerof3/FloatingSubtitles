@@ -55,8 +55,9 @@ namespace RE
 		enum class Flag : std::uint8_t
 		{
 			kNone = 0,
-			kOffscreen = 1 << 0,
-			kObscured = 1 << 1,
+			kSkip = 1 << 0,
+			kOffscreen = 1 << 1,
+			kObscured = 1 << 2,
 			kInitialized = 1 << 7,
 		};
 
@@ -72,49 +73,8 @@ namespace RE
 	NiAVObject* GetTorsoNode(const Actor* a_actor);
 	bool        HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed);
 	void        QueueDialogSubtitles(const char* a_text);
-	bool        ShowGeneralSubsGame();
-	bool        ShowDialogueSubsGame();
 	void        SendHUDMenuMessage(HUD_MESSAGE_TYPE a_type, const std::string& a_text = "", bool a_show = true);
-
-	template <class T>
-	T GetINISetting(std::string_view a_setting)
-	{
-		auto setting = INISettingCollection::GetSingleton()->GetSetting(a_setting);
-
-		if constexpr (std::is_same_v<T, bool>) {
-			return setting->GetBool();
-		} else if constexpr (std::is_same_v<T, float>) {
-			return setting->GetFloat();
-		} else if constexpr (std::is_same_v<T, std::int32_t>) {
-			return setting->GetSInt();
-		} else if constexpr (std::is_same_v<T, Color>) {
-			return setting->GetColor();
-		} else if constexpr (std::is_same_v<T, std::string>) {
-			return setting->GetString();
-		} else {
-			return setting->GetUInt();
-		}
-	}
-
-	template <class T>
-	T GetINIPrefsSetting(std::string_view a_setting)
-	{
-		auto setting = INIPrefSettingCollection::GetSingleton()->GetSetting(a_setting);
-
-		if constexpr (std::is_same_v<T, bool>) {
-			return setting->GetBool();
-		} else if constexpr (std::is_same_v<T, float>) {
-			return setting->GetFloat();
-		} else if constexpr (std::is_same_v<T, std::int32_t>) {
-			return setting->GetSInt();
-		} else if constexpr (std::is_same_v<T, Color>) {
-			return setting->GetColor();
-		} else if constexpr (std::is_same_v<T, std::string>) {
-			return setting->GetString();
-		} else {
-			return setting->GetUInt();
-		}
-	}
+	const char* GetSpeakerName(const RE::TESObjectREFRPtr& a_ref);
 
 	template <class... Args>
 	bool DispatchStaticCall(BSFixedString a_class, BSFixedString a_fnName, Args&&... a_args)
