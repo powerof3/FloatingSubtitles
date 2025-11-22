@@ -200,7 +200,7 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 	if (a_subInfo.isFlagSet(SubtitleFlag::kOffscreen)) {
 		return;
 	}
-	
+
 	const auto ref = a_subInfo.speaker.get();
 	const auto actor = ref->As<RE::Actor>();
 
