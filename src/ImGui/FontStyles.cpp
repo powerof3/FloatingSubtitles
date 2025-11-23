@@ -13,10 +13,10 @@ namespace ImGui
 		const auto resolutionScale = ModAPIHandler::GetSingleton()->GetResolutionScale();
 		size = std::roundf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
 
-		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", -1.5));
+		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", 1.0));
 	}
 
-	void Font::LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges)
+	void Font::LoadFont(ImFontConfig& config)
 	{
 		if (name.empty() || font) {
 			return;
@@ -24,14 +24,12 @@ namespace ImGui
 
 		name = R"(Data\Interface\ImGuiIcons\Fonts\)" + name;
 
-		std::error_code ec;
-		if (!std::filesystem::exists(name, ec)) {
-			return;
-		}
-
 		const auto& io = ImGui::GetIO();
 		config.GlyphExtraAdvanceX = spacing;
-		font = io.Fonts->AddFontFromFileTTF(name.c_str(), size, &config, glyph_ranges);
+		font = io.Fonts->AddFontFromFileTTF(name.c_str(), size, &config);
+
+		std::error_code ec;
+		logger::info("Loaded font [{}|size: {}|spacing: {}] : {}", name, size, spacing, std::filesystem::exists(name, ec));
 	}
 
 	void FontStyles::LoadFonts()
@@ -40,8 +38,11 @@ namespace ImGui
 		primaryFont.LoadFont(config);
 		config.MergeMode = true;
 		secondaryFont.LoadFont(config);
+
 		config.MergeMode = false;
 		dragonFont.LoadFont(config);
+
+		ImGui::GetIO().FontDefault = primaryFont.font;
 	}
 
 	void FontStyles::PushDragonFont()
@@ -82,8 +83,8 @@ namespace ImGui
 			dragonFont.LoadFontSettings(ini, "DragonFont");
 		});
 
-		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
-
 		LoadFonts();
+
+		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
 	}
 }

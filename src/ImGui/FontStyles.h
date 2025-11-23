@@ -5,7 +5,7 @@ namespace ImGui
 	struct Font
 	{
 		void LoadFontSettings(const CSimpleIniA& a_ini, const char* a_section);
-		void LoadFont(ImFontConfig& config, const ImWchar* glyph_ranges = nullptr);
+		void LoadFont(ImFontConfig& config);
 
 		void PushFont() const
 		{
@@ -14,7 +14,7 @@ namespace ImGui
 
 		std::string name{ "Jost-Medium.ttf" };
 		float       size{ 35.0f };
-		float       spacing{ 0.0f };
+		float       spacing{ 1.0f };
 		ImFont*     font;
 	};
 
