@@ -4,7 +4,7 @@
 #include "RE.h"
 #include "Subtitles.h"
 
-class Manager : 
+class Manager :
 	public REX::Singleton<Manager>,
 	public RE::BSTEventSink<RE::MenuOpenCloseEvent>
 

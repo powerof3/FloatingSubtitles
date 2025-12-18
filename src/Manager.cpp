@@ -62,7 +62,7 @@ void Manager::LoadMCMSettings()
 void Manager::OnDataLoaded()
 {
 	RE::UI::GetSingleton()->AddEventSink(this);
-	
+
 	localizedSubs.BuildLocalizedSubtitles();
 
 	LoadMCMSettings();
@@ -290,7 +290,7 @@ RE::BSEventNotifyControl Manager::ProcessEvent(const RE::MenuOpenCloseEvent* a_e
 		talkingActivatorSub.clear();
 		lastTalkingActivatorSub.clear();
 	}
-	
+
 	return RE::BSEventNotifyControl::kContinue;
 }
 
@@ -334,7 +334,7 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 	if (SkipRender()) {
 		return;
 	}
-	
+
 	const auto menuTopicMgr = RE::MenuTopicManager::GetSingleton();
 
 	const bool showGeneral = ShowGeneralSubtitles();
@@ -412,7 +412,7 @@ void Manager::Draw()
 	if (SkipRender()) {
 		return;
 	}
-	
+
 	const auto subtitleManager = RE::SubtitleManager::GetSingleton();
 
 	RE::BSSpinLockGuard gameLocker(subtitleManager->lock);
