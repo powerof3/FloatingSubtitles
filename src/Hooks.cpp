@@ -34,7 +34,7 @@ namespace Hooks
 				switch (hudData->type.get()) {
 				case RE::HUD_MESSAGE_TYPE::kShowSubtitle:
 					{
-						if (Manager::GetSingleton()->HandlesGeneralSubtitles(hudData->text)) {
+						if (Manager::GetSingleton()->HandlesGeneralSubtitles()) {
 							return RE::UI_MESSAGE_RESULTS::kIgnore;
 						}
 					}
@@ -71,7 +71,7 @@ namespace Hooks
 		{
 			if (a_message.type == RE::UI_MESSAGE_TYPE::kUpdate) {
 				if (auto dialogueData = static_cast<RE::BSUIMessageData*>(a_message.data)) {
-					if (dialogueData->fixedStr == RE::InterfaceStrings::GetSingleton()->showText && Manager::GetSingleton()->HandlesDialogueSubtitles(dialogueData->str)) {
+					if (dialogueData->fixedStr == RE::InterfaceStrings::GetSingleton()->showText && Manager::GetSingleton()->HandlesDialogueSubtitles()) {
 						return RE::UI_MESSAGE_RESULTS::kIgnore;
 					}
 				}

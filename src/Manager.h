@@ -4,7 +4,10 @@
 #include "RE.h"
 #include "Subtitles.h"
 
-class Manager : public REX::Singleton<Manager>
+class Manager : 
+	public REX::Singleton<Manager>,
+	public RE::BSTEventSink<RE::MenuOpenCloseEvent>
+
 {
 public:
 	void OnDataLoaded();
@@ -17,8 +20,8 @@ public:
 	void AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle);
 	void UpdateSubtitleInfo(RE::SubtitleManager* a_manager);
 
-	bool HandlesGeneralSubtitles(RE::BSString& a_text) const;
-	bool HandlesDialogueSubtitles(RE::BSString* a_text) const;
+	bool HandlesGeneralSubtitles() const;
+	bool HandlesDialogueSubtitles() const;
 
 private:
 	enum class OffscreenSubtitle
@@ -60,8 +63,6 @@ private:
 	using ReadLocker = std::shared_lock<RWLock>;
 	using WriteLocker = std::unique_lock<RWLock>;
 
-	static bool HasObjectTag(RE::BSString& a_text);
-
 	bool ShowGeneralSubtitles() const;
 	bool ShowDialogueSubtitles() const;
 
@@ -77,9 +78,11 @@ private:
 	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
 	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 
-	std::string GetScaleformSubtitle(const RE::BSString& a_subtitle);
-	void        BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle);
+	std::string GetScaleformSubtitle(const RE::BSString& a_subtitle, bool a_dual);
+	void        BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle, bool a_dialogueSubtitle = false);
 	void        QueueOffscreenSubtitle() const;
+
+	RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
 
 	// members
 	mutable RWLock                     subtitleLock;
@@ -91,9 +94,9 @@ private:
 	ImVec4                             speakerColorFloat4{};
 	bool                               visible{ true };
 	LocalizedSubtitles                 localizedSubs;
+	std::string                        talkingActivatorSub{};
+	std::string                        lastTalkingActivatorSub{};
 	std::string                        offscreenSub{};
 	std::string                        lastOffscreenSub{};
 	std::uint32_t                      offscreenSubCount{ 0 };
-
-	static constexpr std::string_view objectTag{ "[REF]" };
 };

@@ -10,7 +10,7 @@ namespace RE
 		read_uint32(dataSize, a_buffer, bufferPosition);
 
 		directory.reserve(entryCount);
-		for (uint32_t i = 0; i < entryCount; ++i) {
+		for (std::uint32_t i = 0; i < entryCount; ++i) {
 			DirectoryEntry entry;
 			read_uint32(entry.stringID, a_buffer, bufferPosition);
 			read_uint32(entry.offset, a_buffer, bufferPosition);
