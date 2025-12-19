@@ -179,6 +179,53 @@ void Manager::RebuildProcessedSubtitles()
 	}
 }
 
+void Manager::UpdateSubtitleInfo(RE::SubtitleInfoEx& a_subInfo, bool a_buildOffscreenSubs)
+{
+	a_subInfo.flagsRaw() = 0;
+
+	const auto& ref = a_subInfo.speaker.get();
+
+	if (a_subInfo.targetDistance == RE::NI_INFINITY) {
+		auto refLoc = ref->GetWorldLocation();
+		auto playerLoc = RE::PlayerCharacter::GetSingleton()->GetWorldLocation();
+		a_subInfo.targetDistance = refLoc.GetSquaredDistance(playerLoc);
+	}
+
+	const bool showGeneral = ShowGeneralSubtitles();
+	const bool showDialogue = ShowDialogueSubtitles();
+	const bool isDialogueSpeaker = RE::MenuTopicManager::GetSingleton()->IsCurrentSpeaker(a_subInfo.speaker);
+
+	if ((isDialogueSpeaker && !showDialogue) ||
+		(!isDialogueSpeaker && !showGeneral) ||
+		!a_subInfo.forceDisplay && a_subInfo.targetDistance > maxDistanceEndSq) {
+		a_subInfo.setFlag(SubtitleFlag::kSkip, true);
+		return;
+	}
+
+	if (!ref->IsActor() || (ref->IsPlayerRef() && RE::PlayerCamera::GetSingleton()->IsInFirstPerson())) {
+		if (a_buildOffscreenSubs) {
+			BuildOffscreenSubtitle(ref, a_subInfo.subtitle, isDialogueSpeaker);
+		}
+		a_subInfo.setFlag(SubtitleFlag::kSkip, true);
+		return;
+	}
+
+	CalculateVisibility(a_subInfo);
+
+	if (a_subInfo.isFlagSet(SubtitleFlag::kOffscreen)) {
+		if (a_buildOffscreenSubs) {
+			BuildOffscreenSubtitle(ref, a_subInfo.subtitle, false);
+		}
+		return;
+	} else if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
+		a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kDraw, settings.obscuredSubtitleAlpha > 0.0f);
+	} else {
+		a_subInfo.setFlag(SubtitleFlag::kDraw, true);
+	}
+
+	CalculateAlphaModifier(a_subInfo);
+}
+
 void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 {
 	if (!a_subInfo.isFlagSet(SubtitleFlag::kDraw)) {
@@ -304,24 +351,18 @@ void Manager::CalculateVisibility(RE::SubtitleInfoEx& a_subInfo)
 		{
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kOffscreen, true);
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kObscured, false);
-
-			BuildOffscreenSubtitle(ref, a_subInfo.subtitle, false);
 		}
 		break;
 	case RayCaster::Result::kObscured:
 		{
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kObscured, true);
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kOffscreen, false);
-
-			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kDraw, settings.obscuredSubtitleAlpha > 0.0f);
 		}
 		break;
 	case RayCaster::Result::kVisible:
 		{
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kOffscreen, false);
 			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kObscured, false);
-
-			a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kDraw, true);
 		}
 		break;
 	default:
@@ -335,42 +376,18 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleManager* a_manager)
 		return;
 	}
 
-	const auto menuTopicMgr = RE::MenuTopicManager::GetSingleton();
-
-	const bool showGeneral = ShowGeneralSubtitles();
-	const bool showDialogue = ShowDialogueSubtitles();
-
-	RE::BSSpinLockGuard locker(a_manager->lock);
+	RE::BSSpinLockGuard gameLocker(a_manager->lock);
 	{
-		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(a_manager->subtitles);
-
 		lastOffscreenSub = offscreenSub;
 		offscreenSub.clear();
 		offscreenSubCount = 0;
-
 		lastTalkingActivatorSub = talkingActivatorSub;
 
+		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(a_manager->subtitles);
+
 		for (auto& subInfo : subtitleArray) {
-			subInfo.flagsRaw() = 0;
-
 			if (const auto& ref = subInfo.speaker.get()) {
-				bool isDialogueSpeaker = menuTopicMgr->IsCurrentSpeaker(subInfo.speaker);
-
-				if ((isDialogueSpeaker && !showDialogue) ||
-					(!isDialogueSpeaker && !showGeneral) ||
-					!subInfo.forceDisplay && subInfo.targetDistance > maxDistanceEndSq) {
-					subInfo.setFlag(SubtitleFlag::kSkip, true);
-					continue;
-				}
-
-				if (!ref->IsActor() || (ref->IsPlayerRef() && RE::PlayerCamera::GetSingleton()->IsInFirstPerson())) {
-					BuildOffscreenSubtitle(ref, subInfo.subtitle, isDialogueSpeaker);
-					subInfo.setFlag(SubtitleFlag::kSkip, true);
-					continue;
-				}
-
-				CalculateVisibility(subInfo);
-				CalculateAlphaModifier(subInfo);
+				UpdateSubtitleInfo(subInfo, true);
 			}
 		}
 
@@ -421,10 +438,16 @@ void Manager::Draw()
 		params.spacing = settings.subtitleSpacing;
 		params.speakerColor = speakerColorFloat4;
 
+		bool inFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
+
 		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(subtitleManager->subtitles);
 
 		for (auto& subInfo : subtitleArray | std::views::reverse) {  // reverse order so closer subtitles get rendered on top
 			if (const auto& ref = subInfo.speaker.get()) {
+				if (inFreeCameraMode) {
+					UpdateSubtitleInfo(subInfo, false);
+				}
+
 				if (!subInfo.isFlagSet(SubtitleFlag::kDraw)) {
 					continue;
 				}

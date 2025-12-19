@@ -75,6 +75,8 @@ private:
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;
 	static RE::NiPoint3 GetSubtitleAnchorPosImpl(const RE::TESObjectREFRPtr& a_ref, float a_height);
 
+	void UpdateSubtitleInfo(RE::SubtitleInfoEx& a_subInfo, bool a_buildOffscreenSubs);
+
 	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
 	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 

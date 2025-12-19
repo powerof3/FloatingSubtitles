@@ -58,7 +58,8 @@ namespace RE
 			kSkip = 1 << 0,
 			kOffscreen = 1 << 1,
 			kObscured = 1 << 2,
-			kDraw = 1 << 3,
+			kUpdated = 1 << 3,
+			kDraw = 1 << 4,
 		};
 
 		std::uint32_t& alphaModifier() { return pad04; }
