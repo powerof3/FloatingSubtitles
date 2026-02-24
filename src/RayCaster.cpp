@@ -72,8 +72,13 @@ RayCaster::RayCaster(RE::Actor* a_target) :
 
 RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 {
-	if (auto root = actor->Get3D()) {
-		if (!RE::Main::WorldRootCamera()->PointInFrustum(root->worldBound.center, root->worldBound.radius)) {
+	auto* root = actor->Get3D();
+	if (!root) {
+		return Result::kOffscreen;
+	}
+
+	if (auto* camera = RE::Main::WorldRootCamera()) {
+		if (!camera->PointInFrustum(root->worldBound.center, root->worldBound.radius)) {
 			return Result::kOffscreen;
 		}
 	}
@@ -98,7 +103,7 @@ RayCaster::Result RayCaster::GetResult(bool a_debugRay)
 	pickData.rayInput.filterInfo.SetCollisionLayer(RE::COL_LAYER::kLOS);
 
 	RayCollector collector(actor, RE::COL_LAYER::kLOS);
-	pickData.rayHitCollectorA8 = &collector;
+	pickData.closestRayHitCollector = &collector;
 
 	bool result = false;
 

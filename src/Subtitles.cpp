@@ -400,8 +400,8 @@ void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
 		auto  textShadow = ImGui::GetColorU32(style.Colors[ImGuiCol_TextShadow], a_screenParams.alphaPrimary);
 		auto  shadowOffset = style.TextShadowOffset;
 
-		const ImVec2      textPos(posX - (ImGui::CalcTextSize(a_screenParams.speakerName.c_str()).x * 0.5f), posY);
 		const std::string line = std::format("{}:", a_screenParams.speakerName);
+		const ImVec2      textPos(posX - (ImGui::CalcTextSize(line.c_str()).x * 0.5f), posY);
 
 		auto* drawList = ImGui::GetForegroundDrawList();
 		drawList->AddText(textPos + shadowOffset, textShadow, line.c_str());

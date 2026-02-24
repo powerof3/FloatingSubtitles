@@ -44,9 +44,9 @@ private:
 
 		StoredSettings    previous{};
 		StoredSettings    current{};
-		bool              showSpeakerName{ false };
 		float             subtitleHeadOffset{ 15.0f };
 		float             subtitleSpacing{ 0.5f };
+		bool              showSpeakerName{ false };
 		bool              useBTPSWidgetPosition{ true };
 		bool              useTrueHUDWidgetPosition{ true };
 		bool              doRayCastChecks{ true };
@@ -77,8 +77,8 @@ private:
 
 	void UpdateSubtitleInfo(RE::SubtitleInfoEx& a_subInfo, bool a_buildOffscreenSubs);
 
-	void CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
-	void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
+	void        CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const;
+	static void CalculateVisibility(RE::SubtitleInfoEx& a_subInfo);
 
 	std::string GetScaleformSubtitle(const RE::BSString& a_subtitle, bool a_dual);
 	void        BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, const RE::BSString& a_subtitle, bool a_dialogueSubtitle = false);

@@ -147,11 +147,9 @@ const DualSubtitle& Manager::GetProcessedSubtitle(const RE::BSString& a_subtitle
 		}
 	}
 
-	{
-		WriteLocker writeLock(subtitleLock);
-		auto [it, inserted] = processedSubtitles.try_emplace(a_subtitle.c_str(), CreateDualSubtitles(a_subtitle.c_str()));
-		return it->second;
-	}
+	WriteLocker writeLock(subtitleLock);
+	auto [it, inserted] = processedSubtitles.try_emplace(a_subtitle.c_str(), CreateDualSubtitles(a_subtitle.c_str()));
+	return it->second;
 }
 
 void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle)
@@ -296,10 +294,7 @@ void Manager::QueueOffscreenSubtitle() const
 	}
 
 	if (lastTalkingActivatorSub != talkingActivatorSub) {
-		const std::string currentSub = talkingActivatorSub;
-		const std::string prevSub = lastTalkingActivatorSub;
-
-		SKSE::GetTaskInterface()->AddUITask([currentSub, prevSub]() {
+		SKSE::GetTaskInterface()->AddUITask([currentSub = talkingActivatorSub, prevSub = lastTalkingActivatorSub]() {
 			if (auto dialogueMenu = RE::UI::GetSingleton()->GetMenu<RE::DialogueMenu>()) {
 				if (!prevSub.empty()) {
 					RE::FxResponseArgs<0> args{};
@@ -313,10 +308,7 @@ void Manager::QueueOffscreenSubtitle() const
 			}
 		});
 	} else if (lastOffscreenSub != offscreenSub) {
-		const std::string currentSub = offscreenSub;
-		const std::string prevSub = lastOffscreenSub;
-
-		SKSE::GetTaskInterface()->AddUITask([currentSub, prevSub]() {
+		SKSE::GetTaskInterface()->AddUITask([currentSub = offscreenSub, prevSub = lastOffscreenSub]() {
 			if (auto hudMenu = RE::UI::GetSingleton()->GetMenu<RE::HUDMenu>()) {
 				if (!prevSub.empty()) {
 					RE::GFxValue subtitleText(prevSub);

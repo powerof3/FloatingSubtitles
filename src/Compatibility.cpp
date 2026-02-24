@@ -14,7 +14,7 @@ void ModAPIHandler::DisplayTweaks::LoadSettings()
 {
 	SettingLoader::GetSingleton()->Load(FileType::kDisplayTweaks, [this](auto& ini) {
 		resolutionScale = static_cast<float>(ini.GetDoubleValue("Render", "ResolutionScale", resolutionScale));
-		borderlessUpscale = static_cast<float>(ini.GetBoolValue("Render", "BorderlessUpscale", borderlessUpscale));
+		borderlessUpscale = ini.GetBoolValue("Render", "BorderlessUpscale", borderlessUpscale);
 	});
 }
 

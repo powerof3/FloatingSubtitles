@@ -43,6 +43,6 @@ private:
 	// members
 	StartPoint                  startPoint;
 	std::array<RE::NiPoint3, 4> targetPoints;
-	std::array<ImU32, 4>        debugColors{ 0xFF2626FF, 0xFF26FFD3, 0xFF7CFF26, 0xFFFF7C2 };
+	std::array<ImU32, 4>        debugColors{ 0xFF2626FF, 0xFF26FFD3, 0xFF7CFF26, 0xFFFF7C26 };
 	RE::Actor*                  actor;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#define IM_COL32_RED IM_COL32(255, 0, 0, 255) k
+#define IM_COL32_RED IM_COL32(255, 0, 0, 255)
 #define IM_COL32_YELLOW IM_COL32(255, 255, 0, 255)
 #define IM_COL32_GREEN IM_COL32(0, 255, 0, 255)
 #define IM_COL32_BLUE IM_COL32(0, 128, 255, 255)
