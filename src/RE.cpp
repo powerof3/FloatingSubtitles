@@ -63,7 +63,7 @@ namespace RE
 	NiAVObject* GetTorsoNode(const Actor* a_actor)
 	{
 		if (auto middle = a_actor->GetMiddleHighProcess()) {
-			return middle->headNode;
+			return middle->torsoNode;
 		}
 		return nullptr;
 	}

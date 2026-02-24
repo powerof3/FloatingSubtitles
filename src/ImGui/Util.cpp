@@ -36,10 +36,12 @@ namespace ImGui
 	{
 		ImVec2 screenFrom;
 		ImVec2 screenTo;
-		WorldToScreenLoc(a_from, screenFrom);
-		WorldToScreenLoc(a_to, screenTo);
-		auto drawList = ImGui::GetBackgroundDrawList();
-		drawList->AddLine(screenFrom, screenTo, color, 3.0f);
+		auto zFrom = WorldToScreenLoc(a_from, screenFrom);
+		auto zTo = WorldToScreenLoc(a_to, screenTo);
+		if (zFrom > 0.0f && zTo > 0.0f) {
+			auto drawList = ImGui::GetBackgroundDrawList();
+			drawList->AddLine(screenFrom, screenTo, color, 3.0f);
+		}
 	}
 
 	void DrawTextAtPoint(const RE::NiPoint3& a_pos, const char* a_text, ImU32 color)
