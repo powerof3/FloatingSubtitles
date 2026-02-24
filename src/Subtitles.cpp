@@ -233,7 +233,7 @@ void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, 
 std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 {
 	static const srell::regex br_tag(R"(<br\s*/?>)", srell::regex::optimize);
-	static const srell::regex re(R"([^\s<]*<[^>]+/>(?:[^\s<>])*|[^\s<]*<[^>]+>(?:[^<]|<(?!/))*?</[^>]+>(?:[^\s<>])*|[^\s]+)", srell::regex::optimize);
+	static const srell::regex re(R"([^ \t\n\v\f\r<]*<[^>]+/>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r<]*<[^>]+>(?:[^<]|<(?!/))*?</[^>]+>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r]+)", srell::regex::optimize);
 
 	std::vector<std::string> result;
 	std::string              remaining = a_text;
