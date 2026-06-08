@@ -85,12 +85,12 @@ void Manager::OnDataLoaded()
 
 bool Manager::SkipRender() const
 {
-	const bool showGeneral = ShowGeneralSubtitles();
-	const bool showDialogue = ShowDialogueSubtitles();
-
 	if (!visible) {
 		return true;
 	}
+
+	const bool showGeneral = ShowGeneralSubtitles();
+	const bool showDialogue = ShowDialogueSubtitles();
 
 	return !showGeneral && !showDialogue;
 }
@@ -150,6 +150,23 @@ const DualSubtitle& Manager::GetProcessedSubtitle(const RE::BSString& a_subtitle
 	WriteLocker writeLock(subtitleLock);
 	auto [it, inserted] = processedSubtitles.try_emplace(a_subtitle.c_str(), CreateDualSubtitles(a_subtitle.c_str()));
 	return it->second;
+}
+
+void Manager::DrawProcessedSubtitle(const RE::BSString& a_subtitle, const DualSubtitle::ScreenParams& a_params)
+{
+	{
+		ReadLocker writeLock(subtitleLock);
+		if (auto it = processedSubtitles.find(a_subtitle.c_str()); it != processedSubtitles.end()) {
+			it->second.EnsureWrapped();
+			it->second.DrawDualSubtitle(a_params);
+			return;
+		}
+	}
+
+	WriteLocker writeLock(subtitleLock);
+	auto [it, inserted] = processedSubtitles.try_emplace(a_subtitle.c_str(), CreateDualSubtitles(a_subtitle.c_str()));
+	it->second.EnsureWrapped();
+	it->second.DrawDualSubtitle(a_params);
 }
 
 void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle)
@@ -215,7 +232,8 @@ void Manager::UpdateSubtitleInfo(RE::SubtitleInfoEx& a_subInfo, bool a_buildOffs
 			BuildOffscreenSubtitle(ref, a_subInfo.subtitle, false);
 		}
 		return;
-	} else if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
+	}
+	if (a_subInfo.isFlagSet(SubtitleFlag::kObscured)) {
 		a_subInfo.setFlag(RE::SubtitleInfoEx::Flag::kDraw, settings.obscuredSubtitleAlpha > 0.0f);
 	} else {
 		a_subInfo.setFlag(SubtitleFlag::kDraw, true);
@@ -426,41 +444,48 @@ void Manager::Draw()
 
 	RE::BSSpinLockGuard gameLocker(subtitleManager->lock);
 	{
-		DualSubtitle::ScreenParams params;
-		params.spacing = settings.subtitleSpacing;
-		params.speakerColor = speakerColorFloat4;
+		ImGui::SetNextWindowPos(ImGui::GetNativeViewportPos());
+		ImGui::SetNextWindowSize(ImGui::GetNativeViewportSize());
 
-		bool inFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
+		ImGui::Begin("##Main", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBringToFrontOnFocus);
+		{
+			DualSubtitle::ScreenParams params;
+			params.spacing = settings.subtitleSpacing;
+			params.speakerColor = speakerColorFloat4;
 
-		auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(subtitleManager->subtitles);
+			bool inFreeCameraMode = RE::PlayerCamera::GetSingleton()->IsInFreeCameraMode();
 
-		for (auto& subInfo : subtitleArray | std::views::reverse) {  // reverse order so closer subtitles get rendered on top
-			if (const auto& ref = subInfo.speaker.get()) {
-				if (inFreeCameraMode) {
-					UpdateSubtitleInfo(subInfo, false);
+			auto& subtitleArray = reinterpret_cast<RE::BSTArray<RE::SubtitleInfoEx>&>(subtitleManager->subtitles);
+
+			for (auto& subInfo : subtitleArray | std::views::reverse) {  // reverse order so closer subtitles get rendered on top
+				if (const auto& ref = subInfo.speaker.get()) {
+					if (inFreeCameraMode) {
+						UpdateSubtitleInfo(subInfo, false);
+					}
+
+					if (!subInfo.isFlagSet(SubtitleFlag::kDraw)) {
+						continue;
+					}
+
+					auto anchorPos = CalculateSubtitleAnchorPos(subInfo);
+					auto zDepth = ImGui::WorldToScreenLoc(anchorPos, params.pos);
+					if (zDepth < 0.0f) {
+						continue;
+					}
+
+					auto alphaMult = std::bit_cast<float>(subInfo.alphaModifier());
+					params.alphaPrimary = settings.subtitleAlphaPrimary * alphaMult;
+					params.alphaSecondary = settings.subtitleAlphaSecondary * alphaMult;
+					if (settings.showSpeakerName && !RE::IsCrosshairRef(ref)) {
+						params.speakerName = ModAPIHandler::GetSingleton()->GetReferenceName(ref);
+					} else {
+						params.speakerName.clear();
+					}
+
+					DrawProcessedSubtitle(subInfo.subtitle, params);
 				}
-
-				if (!subInfo.isFlagSet(SubtitleFlag::kDraw)) {
-					continue;
-				}
-
-				auto anchorPos = CalculateSubtitleAnchorPos(subInfo);
-				auto zDepth = ImGui::WorldToScreenLoc(anchorPos, params.pos);
-				if (zDepth < 0.0f) {
-					continue;
-				}
-
-				auto alphaMult = std::bit_cast<float>(subInfo.alphaModifier());
-				params.alphaPrimary = settings.subtitleAlphaPrimary * alphaMult;
-				params.alphaSecondary = settings.subtitleAlphaSecondary * alphaMult;
-				if (settings.showSpeakerName && !RE::IsCrosshairRef(ref)) {
-					params.speakerName = ModAPIHandler::GetSingleton()->GetReferenceName(ref);
-				} else {
-					params.speakerName.clear();
-				}
-
-				GetProcessedSubtitle(subInfo.subtitle).DrawDualSubtitle(params);
 			}
 		}
+		ImGui::End();
 	}
 }

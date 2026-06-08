@@ -4,6 +4,7 @@ set(headers ${headers}
 	src/API/TrueHUDAPI.h
 	src/Compatibility.h
 	src/Hooks.h
+	src/ImGui/BSFont.h
 	src/ImGui/FontStyles.h
 	src/ImGui/Renderer.h
 	src/ImGui/Util.h

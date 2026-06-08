@@ -5,16 +5,16 @@
 #include "ImGui/Util.h"
 
 Subtitle::Subtitle(const LocalizedSubtitle& a_subtitle) :
-	lines(WrapText(a_subtitle)),
 	fullLine(a_subtitle.subtitle),
-	validForScaleform(RE::BSScaleformManager::GetSingleton()->IsValidName(a_subtitle.subtitle.c_str()))
+	validForScaleform(RE::BSScaleformManager::GetSingleton()->IsValidName(a_subtitle.subtitle.c_str())),
+	cached(a_subtitle)
 {}
 
-std::vector<Subtitle::Line> Subtitle::WrapText(const LocalizedSubtitle& a_subtitle)
+void Subtitle::WrapTextImpl()
 {
-	std::vector<Line> lines;
-
-	const auto& [text, maxLineWidth, lang] = a_subtitle;
+	lines.clear();
+	
+	const auto& [text, maxLineWidth, lang] = cached;
 
 	if (IsTextCJK(text)) {
 		WrapCJKText(lines, text, maxLineWidth);
@@ -24,8 +24,6 @@ std::vector<Subtitle::Line> Subtitle::WrapText(const LocalizedSubtitle& a_subtit
 
 	// for drawing lines from bottom to top
 	std::ranges::reverse(lines);
-
-	return lines;
 }
 
 void Subtitle::WrapCJKText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth)
@@ -243,7 +241,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 		std::string prefix = match.prefix().str();
 		if (!prefix.empty()) {
 			for (auto it = srell::sregex_iterator(prefix.begin(), prefix.end(), re);
-				 it != srell::sregex_iterator(); ++it) {
+				it != srell::sregex_iterator(); ++it) {
 				result.push_back(it->str());
 			}
 		}
@@ -255,7 +253,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 
 	if (!remaining.empty()) {
 		for (auto it = srell::sregex_iterator(remaining.begin(), remaining.end(), re);
-			 it != srell::sregex_iterator(); ++it) {
+			it != srell::sregex_iterator(); ++it) {
 			result.push_back(it->str());
 		}
 	}
@@ -335,18 +333,26 @@ bool Subtitle::IsTextCJK(const std::string& str)
 	return false;
 }
 
+void Subtitle::WrapText()
+{
+	if (lines.empty()) {
+		WrapTextImpl();
+	}
+	logger::info("Subtitle wrapped into {} lines", lines.size());
+}
+
+void Subtitle::Invalidate()
+{
+	lines.clear();
+}
+
 void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_lineHeight) const
 {
 	if (a_alpha < 0.01f) {
 		return;
 	}
 
-	auto* drawList = ImGui::GetForegroundDrawList();
-
-	const auto& style = ImGui::GetStyle();
-	auto        textColor = ImGui::GetColorU32(style.Colors[ImGuiCol_Text], a_alpha);
-	auto        textShadow = ImGui::GetColorU32(style.Colors[ImGuiCol_TextShadow], a_alpha);
-	auto        shadowOffset = style.TextShadowOffset;
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, a_alpha);
 
 	for (const auto& line : lines) {
 		a_posY -= a_lineHeight;
@@ -359,8 +365,9 @@ void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_
 			}
 
 			const ImVec2 textPos(currentX, a_posY);
-			drawList->AddText(textPos + shadowOffset, textShadow, word.word.c_str());
-			drawList->AddText(textPos, textColor, word.word.c_str());
+			ImGui::SetCursorScreenPos(textPos);
+
+			ImGui::Text(word.word.c_str());
 
 			if (word.isDragonFont) {
 				ImGui::PopFont();
@@ -369,6 +376,8 @@ void Subtitle::DrawSubtitle(float a_posX, float& a_posY, float a_alpha, float a_
 			currentX += word.size.x;
 		}
 	}
+
+	ImGui::PopStyleVar();
 }
 
 DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle) :
@@ -379,6 +388,18 @@ DualSubtitle::DualSubtitle(const LocalizedSubtitle& a_primarySubtitle, const Loc
 	primary(a_primarySubtitle),
 	secondary(a_secondarySubtitle)
 {}
+
+void DualSubtitle::EnsureWrapped()
+{
+	primary.WrapText();
+	secondary.WrapText();
+}
+
+void DualSubtitle::Invalidate()
+{
+	primary.Invalidate();
+	secondary.Invalidate();
+}
 
 void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
 {
@@ -395,17 +416,17 @@ void DualSubtitle::DrawDualSubtitle(const ScreenParams& a_screenParams) const
 	if (!a_screenParams.speakerName.empty() && a_screenParams.alphaPrimary >= 0.01f) {
 		posY -= lineHeight;
 
-		auto& style = ImGui::GetStyle();
-		auto  textColor = ImGui::GetColorU32(a_screenParams.speakerColor, a_screenParams.alphaPrimary);
-		auto  textShadow = ImGui::GetColorU32(style.Colors[ImGuiCol_TextShadow], a_screenParams.alphaPrimary);
-		auto  shadowOffset = style.TextShadowOffset;
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, a_screenParams.alphaPrimary);
+		ImGui::PushStyleColor(ImGuiCol_Text, a_screenParams.speakerColor);
 
 		const std::string line = std::format("{}:", a_screenParams.speakerName);
 		const ImVec2      textPos(posX - (ImGui::CalcTextSize(line.c_str()).x * 0.5f), posY);
 
-		auto* drawList = ImGui::GetForegroundDrawList();
-		drawList->AddText(textPos + shadowOffset, textShadow, line.c_str());
-		drawList->AddText(textPos, textColor, line.c_str());
+		ImGui::SetCursorScreenPos(textPos);
+		ImGui::Text(line.c_str());
+
+		ImGui::PopStyleColor();
+		ImGui::PopStyleVar();
 	}
 }
 

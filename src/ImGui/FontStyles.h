@@ -33,6 +33,8 @@ namespace ImGui
 		void LoadStyleSettings(CSimpleIniA& a_ini);
 		void LoadFontStyles();
 
+		static bool UsingDefaultFont();
+
 		void LoadFonts();
 
 		void PushDragonFont();

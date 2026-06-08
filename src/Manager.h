@@ -70,6 +70,7 @@ private:
 
 	void                AddProcessedSubtitle(const char* subtitle);
 	const DualSubtitle& GetProcessedSubtitle(const RE::BSString& a_subtitle);
+	void                DrawProcessedSubtitle(const RE::BSString& a_subtitle, const DualSubtitle::ScreenParams& a_);
 	void                RebuildProcessedSubtitles();
 
 	RE::NiPoint3        CalculateSubtitleAnchorPos(const RE::SubtitleInfoEx& a_subInfo) const;

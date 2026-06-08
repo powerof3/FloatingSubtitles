@@ -1,8 +1,8 @@
 #include "FontStyles.h"
 
+#include "BSFont.h"
 #include "Compatibility.h"
 #include "SettingLoader.h"
-#include "Util.h"
 
 namespace ImGui
 {
@@ -35,14 +35,23 @@ namespace ImGui
 	void FontStyles::LoadFonts()
 	{
 		ImFontConfig config;
-		primaryFont.LoadFont(config);
+
+		auto& io = ImGui::GetIO();
+		if (UsingDefaultFont()) {
+			logger::info("Using default font...");
+			config.GlyphExtraAdvanceX = 1.0f;
+			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, 28.0f * ModAPIHandler::GetSingleton()->GetResolutionScale(), &config);
+		} else {
+			primaryFont.LoadFont(config);
+		}
+
 		config.MergeMode = true;
 		secondaryFont.LoadFont(config);
 
 		config.MergeMode = false;
 		dragonFont.LoadFont(config);
 
-		ImGui::GetIO().FontDefault = primaryFont.font;
+		io.FontDefault = primaryFont.font;
 	}
 
 	void FontStyles::PushDragonFont()
@@ -74,7 +83,7 @@ namespace ImGui
 
 		colors[ImGuiCol_Text] = user.text;
 		style.Colors[ImGuiCol_TextShadowDisabled] = user.shadowText;
-		style.TextShadowOffset = ImVec2(1.50f, 1.50f);
+		style.TextShadowOffset = { 2.0, 2.0 };
 
 		// load fonts
 		SettingLoader::GetSingleton()->Load(FileType::kFonts, [&](auto& ini) {
@@ -86,5 +95,31 @@ namespace ImGui
 		LoadFonts();
 
 		style.ScaleAllSizes(ModAPIHandler::GetSingleton()->GetResolutionScale());
+	}
+
+	bool FontStyles::UsingDefaultFont()
+	{
+		RE::BSResourceNiBinaryStream fontConfig("sFontConfigFile:Fonts"_ini.value());
+		if (!fontConfig.good()) {
+			return false;
+		}
+
+		constexpr std::string_view target = "$EverywhereMediumFont"sv;
+
+		std::string line;
+
+		while (std::getline(fontConfig, line)) {
+			if (line.contains(target)) {
+				auto eq = line.find('=');
+				auto q1 = line.find('"', eq);
+				auto q2 = line.find('"', q1 + 1);
+				auto font = line.substr(q1 + 1, q2 - q1 - 1);
+				if (font == "Futura Condensed") {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
