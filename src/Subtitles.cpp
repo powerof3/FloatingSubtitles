@@ -13,7 +13,7 @@ Subtitle::Subtitle(const LocalizedSubtitle& a_subtitle) :
 void Subtitle::WrapTextImpl()
 {
 	lines.clear();
-	
+
 	const auto& [text, maxLineWidth, lang] = cached;
 
 	if (IsTextCJK(text)) {
@@ -241,7 +241,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 		std::string prefix = match.prefix().str();
 		if (!prefix.empty()) {
 			for (auto it = srell::sregex_iterator(prefix.begin(), prefix.end(), re);
-				it != srell::sregex_iterator(); ++it) {
+				 it != srell::sregex_iterator(); ++it) {
 				result.push_back(it->str());
 			}
 		}
@@ -253,7 +253,7 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 
 	if (!remaining.empty()) {
 		for (auto it = srell::sregex_iterator(remaining.begin(), remaining.end(), re);
-			it != srell::sregex_iterator(); ++it) {
+			 it != srell::sregex_iterator(); ++it) {
 			result.push_back(it->str());
 		}
 	}
