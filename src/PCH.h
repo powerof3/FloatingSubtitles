@@ -17,7 +17,8 @@
 #include <ClibUtil/string.hpp>
 #include <ClibUtil/timer.hpp>
 
-#include <boost_unordered.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
+#include <boost/unordered/unordered_flat_set.hpp>
 #include <freetype/freetype.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <srell.hpp>

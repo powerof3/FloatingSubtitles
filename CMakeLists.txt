@@ -132,10 +132,10 @@ else ()
 	)
 endif()
 
+find_package(boost_unordered CONFIG REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
-find_path(BOOST_UNORDERED_INCLUDE_DIRS ".editorconfig")
 find_path(CLIB_UTIL_INCLUDE_DIRS "ClibUtil/utils.hpp")
 find_path(SRELL_INCLUDE_DIRS "srell.hpp")
 
@@ -189,7 +189,6 @@ target_include_directories(
 	PRIVATE
 		${CMAKE_CURRENT_BINARY_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-		${BOOST_UNORDERED_INCLUDE_DIRS}
 		${CLIB_UTIL_INCLUDE_DIRS}
 )
 
@@ -197,6 +196,7 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PRIVATE
 		${CommonLibName}::${CommonLibName}
+		Boost::unordered
 		Freetype::Freetype
 		imgui::imgui
 )
