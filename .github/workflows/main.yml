@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   run:
-    uses: powerof3/pack-skse-mod/.github/workflows/pack.yml@main
+    uses: powerof3/pack-skse-mod/.github/workflows/pack.yml@main-vs2022
     with:
       CMAKE_VR_CONFIG_PRESET: ''
       CMAKE_VR_BUILD_PRESET: ''
