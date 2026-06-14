@@ -58,9 +58,10 @@ namespace ImGui::Renderer
 	{
 		static void thunk(RE::IMenu* a_menu)
 		{
+			func(a_menu);
+			
 			// Skip if Imgui is not loaded
 			if (!initialized.load()) {
-				func(a_menu);
 				return;
 			}
 
@@ -84,8 +85,6 @@ namespace ImGui::Renderer
 			ImGui::EndFrame();
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-			func(a_menu);
 		}
 		static inline REL::Relocation<decltype(thunk)> func;
 		static inline std::size_t                      idx{ 0x6 };

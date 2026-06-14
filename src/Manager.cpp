@@ -449,6 +449,8 @@ void Manager::Draw()
 
 		ImGui::Begin("##Main", nullptr, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBringToFrontOnFocus);
 		{
+			ImGui::GetWindowDrawList()->Flags |= ImDrawListFlags_TextNoPixelSnap;
+			
 			DualSubtitle::ScreenParams params;
 			params.spacing = settings.subtitleSpacing;
 			params.speakerColor = speakerColorFloat4;

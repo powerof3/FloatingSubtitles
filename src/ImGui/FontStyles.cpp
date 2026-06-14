@@ -11,7 +11,7 @@ namespace ImGui
 		name = a_ini.GetValue(a_section, "sFont", "");
 
 		const auto resolutionScale = ModAPIHandler::GetSingleton()->GetResolutionScale();
-		size = std::roundf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
+		size = std::truncf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
 
 		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", 1.0));
 	}
@@ -40,7 +40,7 @@ namespace ImGui
 		if (UsingDefaultFont()) {
 			logger::info("Using default font...");
 			config.GlyphExtraAdvanceX = 1.0f;
-			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, 28.0f * ModAPIHandler::GetSingleton()->GetResolutionScale(), &config);
+			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, std::truncf(28.0f * ModAPIHandler::GetSingleton()->GetResolutionScale()), &config);
 		} else {
 			primaryFont.LoadFont(config);
 		}
