@@ -59,7 +59,7 @@ namespace ImGui::Renderer
 		static void thunk(RE::IMenu* a_menu)
 		{
 			func(a_menu);
-			
+
 			// Skip if Imgui is not loaded
 			if (!initialized.load()) {
 				return;
