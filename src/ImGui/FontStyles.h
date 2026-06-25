@@ -49,6 +49,7 @@ namespace ImGui
 		Style def;
 		Style user;
 
+		Font futuraFont{};
 		Font primaryFont{};
 		Font secondaryFont{};
 		Font dragonFont{};

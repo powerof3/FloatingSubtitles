@@ -60,6 +60,14 @@ namespace RE
 		return nullptr;
 	}
 
+	NiAVObject* GetTorsoNode(const TESObjectREFRPtr& a_ref)
+	{
+		if (auto actor = a_ref->As<Actor>()) {
+			return GetTorsoNode(actor);
+		}
+		return nullptr;
+	}
+
 	NiAVObject* GetTorsoNode(const Actor* a_actor)
 	{
 		if (auto middle = a_actor->GetMiddleHighProcess()) {

@@ -71,7 +71,8 @@ namespace RE
 
 	bool        IsCrosshairRef(const TESObjectREFRPtr& a_ref);
 	NiAVObject* GetHeadNode(const TESObjectREFRPtr& a_ref);
-	NiAVObject* GetTorsoNode(const Actor* a_actor);
+	NiAVObject* GetTorsoNode(const TESObjectREFRPtr& a_ref);
+	NiAVObject* GetTorsoNode(const Actor* a_ref);
 	bool        HasLOSToTarget(PlayerCharacter* a_player, TESObjectREFR* a_target, bool& pickPerformed);
 	void        QueueDialogSubtitles(const char* a_text);
 	void        SendHUDMenuMessage(HUD_MESSAGE_TYPE a_type, const std::string& a_text = "", bool a_show = true);

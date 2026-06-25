@@ -9,10 +9,7 @@ namespace ImGui
 	void Font::LoadFontSettings(const CSimpleIniA& a_ini, const char* a_section)
 	{
 		name = a_ini.GetValue(a_section, "sFont", "");
-
-		const auto resolutionScale = ModAPIHandler::GetSingleton()->GetResolutionScale();
-		size = std::truncf((a_ini.GetLongValue(a_section, "iSize", 30)) * resolutionScale);
-
+		size = std::truncf(a_ini.GetLongValue(a_section, "iSize", 28) * ModAPIHandler::GetSingleton()->GetResolutionScale());
 		spacing = static_cast<float>(a_ini.GetDoubleValue(a_section, "fSpacing", 1.0));
 	}
 
@@ -39,8 +36,8 @@ namespace ImGui
 		auto& io = ImGui::GetIO();
 		if (UsingDefaultFont()) {
 			logger::info("Using default font...");
-			config.GlyphExtraAdvanceX = 1.0f;
-			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, std::truncf(28.0f * ModAPIHandler::GetSingleton()->GetResolutionScale()), &config);
+			config.GlyphExtraAdvanceX = futuraFont.spacing;
+			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, std::truncf(futuraFont.size * ModAPIHandler::GetSingleton()->GetResolutionScale()), &config);
 		} else {
 			primaryFont.LoadFont(config);
 		}
@@ -87,6 +84,7 @@ namespace ImGui
 
 		// load fonts
 		SettingLoader::GetSingleton()->Load(FileType::kFonts, [&](auto& ini) {
+			futuraFont.LoadFontSettings(ini, "FuturaFont");
 			primaryFont.LoadFontSettings(ini, "PrimaryFont");
 			secondaryFont.LoadFontSettings(ini, "SecondaryFont");
 			dragonFont.LoadFontSettings(ini, "DragonFont");
