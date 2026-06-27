@@ -37,7 +37,10 @@ namespace ImGui
 		if (UsingDefaultFont()) {
 			logger::info("Using default font...");
 			config.GlyphExtraAdvanceX = futuraFont.spacing;
-			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, std::truncf(futuraFont.size * ModAPIHandler::GetSingleton()->GetResolutionScale()), &config);
+			// futuraFont.size already includes GetResolutionScale() (applied in
+			// LoadFontSettings); applying it again double-scales the default font at
+			// any resolution scale > 1 (e.g. Display Tweaks upscaling).
+			primaryFont.font = io.Fonts->AddFontFromMemoryCompressedTTF(BSFont_Data, BSFont_Size, futuraFont.size, &config);
 		} else {
 			primaryFont.LoadFont(config);
 		}
@@ -80,7 +83,9 @@ namespace ImGui
 
 		colors[ImGuiCol_Text] = user.text;
 		style.Colors[ImGuiCol_TextShadowDisabled] = user.shadowText;
-		style.TextShadowOffset = { 2.0, 2.0 };
+		// Honor the configured fTextShadowOffset (set 0 to disable the shadow) instead
+		// of a hardcoded 2px that ignored the setting.
+		style.TextShadowOffset = { user.shadowOffsetVar, user.shadowOffsetVar };
 
 		// load fonts
 		SettingLoader::GetSingleton()->Load(FileType::kFonts, [&](auto& ini) {
