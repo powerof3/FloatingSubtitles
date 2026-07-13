@@ -35,9 +35,12 @@ namespace Hooks
 				// runtime value via CommonLibVR instead of comparing against the raw SE constant.
 				const auto type = hudData->type.get();
 				if (type == RE::GetHUDMessageType(RE::HUD_MESSAGE_TYPE::kShowSubtitle)) {
-					const bool handles = Manager::GetSingleton()->HandlesGeneralSubtitles();
+					// VR's DialogueMenu forwards real dialogue text as a second kShowSubtitle to HUDMenu
+					// (SE/AE never do this); don't let general-suppression swallow that forward.
+					const bool dialogueForwarding = REL::Module::IsVR() && !Manager::GetSingleton()->HandlesDialogueSubtitles() && RE::MenuTopicManager::GetSingleton()->menuOpen;
+					const bool handles = Manager::GetSingleton()->HandlesGeneralSubtitles() && !dialogueForwarding;
 					if (Manager::GetSingleton()->GetSettings().debugLog) {
-						logger::debug("[HUDMenu] kShowSubtitle: HandlesGeneral={} -> {}", handles, handles ? "suppress(kIgnore)" : "pass-through");
+						logger::debug("[HUDMenu] kShowSubtitle: HandlesGeneral={} dialogueForwarding={} -> {}", handles, dialogueForwarding, handles ? "suppress(kIgnore)" : "pass-through");
 					}
 					if (handles) {
 						return RE::UI_MESSAGE_RESULTS::kIgnore;
