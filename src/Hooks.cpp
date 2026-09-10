@@ -47,7 +47,7 @@ namespace Hooks
 							"WorldMapMode"sv,
 							"BookMode"sv,
 							"JournalMode"sv
-						};	
+						};
 						if (std::ranges::any_of(badModes, [&](const auto& mode) { return REX::STR::IEQUALS(hudData->text, mode); })) {
 							Manager::GetSingleton()->SetVisible(!hudData->show);
 						}

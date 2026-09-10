@@ -13,11 +13,11 @@
 #include <shared_mutex>
 #include <shlobj.h>
 
+#include <boost/regex.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
 #include <freetype/freetype.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#include <boost/regex.hpp>
 #include <xbyak/xbyak.h>
 
 #include "imgui_impl_win32.h"
