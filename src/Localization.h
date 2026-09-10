@@ -59,10 +59,10 @@ public:
 private:
 	using SubtitleID = std::uint64_t;  // hashed id (string id + mod index)
 
-	using MultiSubtitleToIDMap = FlatMap<std::string, FlatSet<SubtitleID>>;
-	using MultiIDToSubtitleMap = FlatMap<SubtitleID, FlatMap<Language, FlatSet<std::string>>>;
+	using MultiSubtitleToIDMap = StringMap<FlatSet<SubtitleID>>;
+	using MultiIDToSubtitleMap = FlatMap<SubtitleID, FlatMap<Language, StringSet>>;
 
-	using SubtitleToIDMap = FlatMap<std::string, SubtitleID>;
+	using SubtitleToIDMap = StringMap<SubtitleID>;
 	using IDToSubtitleMap = FlatMap<SubtitleID, FlatMap<Language, std::string>>;
 
 	void ReadILStringFiles(MultiSubtitleToIDMap& a_multiSubToID, MultiIDToSubtitleMap& a_multiIDToSub) const;

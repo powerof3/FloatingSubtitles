@@ -40,6 +40,31 @@ using FlatMap = boost::unordered_flat_map<K, D, H, KEqual>;
 template <class K, class H = boost::hash<K>, class KEqual = std::equal_to<K>>
 using FlatSet = boost::unordered_flat_set<K, H, KEqual>;
 
+struct string_hash
+{
+	using is_transparent = void;
+
+	std::size_t operator()(const char* str) const
+	{
+		return boost::hash<std::string_view>{}(str);
+	}
+
+	std::size_t operator()(std::string_view str) const
+	{
+		return boost::hash<std::string_view>{}(str);
+	}
+
+	std::size_t operator()(const std::string& str) const
+	{
+		return boost::hash<std::string>{}(str);
+	}
+};
+
+template <class D>
+using StringMap = FlatMap<std::string, D, string_hash, std::equal_to<>>;
+
+using StringSet = FlatSet<std::string, string_hash, std::equal_to<>>;
+
 namespace RE
 {
 	template <class T>

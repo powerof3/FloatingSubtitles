@@ -20,4 +20,6 @@ namespace ImGui
 	ImVec2 GetNativeViewportSize();
 	ImVec2 GetNativeViewportPos();
 	ImVec2 GetNativeViewportCenter();
+
+	ImVec4 ColorConvertU32ToFloat4_RGB(ImU32 in);
 }

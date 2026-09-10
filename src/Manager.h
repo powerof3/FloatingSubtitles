@@ -88,18 +88,18 @@ private:
 	RE::BSEventNotifyControl ProcessEvent(const RE::MenuOpenCloseEvent* a_event, RE::BSTEventSource<RE::MenuOpenCloseEvent>*) override;
 
 	// members
-	mutable RWLock                     subtitleLock;
-	FlatMap<std::string, DualSubtitle> processedSubtitles;
-	MCMSettings                        settings;
-	float                              maxDistanceStartSq{ 4194304.0f };
-	float                              maxDistanceEndSq{ 4624220.16f };
-	ImU32                              speakerColorU32{};
-	ImVec4                             speakerColorFloat4{};
-	bool                               visible{ true };
-	LocalizedSubtitles                 localizedSubs;
-	std::string                        talkingActivatorSub{};
-	std::string                        lastTalkingActivatorSub{};
-	std::string                        offscreenSub{};
-	std::string                        lastOffscreenSub{};
-	std::uint32_t                      offscreenSubCount{ 0 };
+	mutable RWLock          subtitleLock;
+	StringMap<DualSubtitle> processedSubtitles;
+	MCMSettings             settings;
+	float                   maxDistanceStartSq{ 4194304.0f };
+	float                   maxDistanceEndSq{ 4624220.16f };
+	ImU32                   speakerColorU32{};
+	ImVec4                  speakerColorFloat4{};
+	bool                    visible{ true };
+	LocalizedSubtitles      localizedSubs;
+	std::string             talkingActivatorSub{};
+	std::string             lastTalkingActivatorSub{};
+	std::string             offscreenSub{};
+	std::string             lastOffscreenSub{};
+	std::uint32_t           offscreenSubCount{ 0 };
 };

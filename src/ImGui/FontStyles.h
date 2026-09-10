@@ -23,8 +23,8 @@ namespace ImGui
 		ImVec4 text{ 0.984f, 0.984f, 0.984f, 1.0f };
 		ImVec4 shadowText{ 1.0f, 1.0f, 1.0f, 1.0f };
 
-		ImVec2 shadowOffset{ 3.0f, 3.0f };
-		float  shadowOffsetVar{ 3.0f };
+		ImVec2 shadowOffset{ 2.0f, 2.0f };
+		float  shadowOffsetVar{ 2.0f };
 	};
 
 	class FontStyles : public REX::TSingleton<FontStyles>

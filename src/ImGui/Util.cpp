@@ -103,4 +103,14 @@ namespace ImGui
 		const auto Size = GetNativeViewportSize();
 		return { Size.x * 0.5f, Size.y * 0.5f };
 	}
+
+	ImVec4 ColorConvertU32ToFloat4_RGB(ImU32 in)
+	{
+		constexpr float s = 1.0f / 255.0f;
+		return ImVec4(
+			((in >> IM_COL32_B_SHIFT) & 0xFF) * s,
+			((in >> IM_COL32_G_SHIFT) & 0xFF) * s,
+			((in >> IM_COL32_R_SHIFT) & 0xFF) * s,
+			1.0f);
+	}
 }

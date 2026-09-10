@@ -74,10 +74,9 @@ void Manager::OnDataLoaded()
 	REX::INFO("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
 
 	speakerColorU32 = "iSubtitleSpeakerNameColor:Interface"_ini.value();
-	speakerColorFloat4 = ImGui::ColorConvertU32ToFloat4(speakerColorU32);
-	speakerColorFloat4.w = 1.0f;
+	speakerColorFloat4 = ImGui::ColorConvertU32ToFloat4_RGB(speakerColorU32);
 
-	REX::INFO("Subtitle speaker color: {},{},{} ({:X})", speakerColorFloat4.x, speakerColorFloat4.y, speakerColorFloat4.z, speakerColorU32);
+	REX::INFO("Subtitle speaker color: {},{},{} (0x{:X})", speakerColorFloat4.x, speakerColorFloat4.y, speakerColorFloat4.z, speakerColorU32);
 
 	//RE::INIPrefSettingCollection::GetSingleton()->GetSetting("bGeneralSubtitles:Interface")->data.b = true;
 	//RE::INIPrefSettingCollection::GetSingleton()->GetSetting("bDialogueSubtitles:Interface")->data.b = true;
@@ -264,7 +263,7 @@ void Manager::CalculateAlphaModifier(RE::SubtitleInfoEx& a_subInfo) const
 			return 1.0f - (t * t * t);
 		};
 
-		alpha *= 1.0f - cubicEaseOut(t);
+		alpha *= cubicEaseOut(t);
 	} else if (auto high = actor->GetHighProcess(); high && high->fadeAlpha < 1.0f) {
 		alpha *= high->fadeAlpha;
 	} else if (actor->IsDead() && actor->voiceTimer < 1.0f) {
@@ -293,7 +292,7 @@ void Manager::BuildOffscreenSubtitle(const RE::TESObjectREFRPtr& a_speaker, cons
 		talkingActivatorSub = scaleformSub;
 	} else {
 		if (std::string name = ModAPIHandler::GetSingleton()->GetReferenceName(a_speaker); !name.empty()) {
-			offscreenSub.append(std::format("<font color='#{:6X}'>{}</font>: {}", speakerColorU32, name, scaleformSub));
+			offscreenSub.append(std::format("<font color='#{:06X}'>{}</font>: {}", speakerColorU32, name, scaleformSub));
 		} else {
 			offscreenSub.append(scaleformSub);
 		}
