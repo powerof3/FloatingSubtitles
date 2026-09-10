@@ -14,20 +14,20 @@ namespace ImGui::Renderer
 			if (const auto renderer = RE::BSGraphics::Renderer::GetSingleton()) {
 				const auto swapChain = reinterpret_cast<IDXGISwapChain*>(renderer->data.renderWindows[0].swapChain);
 				if (!swapChain) {
-					logger::error("couldn't find swapChain");
+					REX::ERROR("couldn't find swapChain");
 					return;
 				}
 
 				DXGI_SWAP_CHAIN_DESC desc{};
 				if (FAILED(swapChain->GetDesc(std::addressof(desc)))) {
-					logger::error("IDXGISwapChain::GetDesc failed.");
+					REX::ERROR("IDXGISwapChain::GetDesc failed.");
 					return;
 				}
 
 				const auto device = reinterpret_cast<ID3D11Device*>(renderer->data.forwarder);
 				const auto context = reinterpret_cast<ID3D11DeviceContext*>(renderer->data.context);
 
-				logger::info("Initializing ImGui..."sv);
+				REX::INFO("Initializing ImGui..."sv);
 
 				ImGui::CreateContext();
 
@@ -35,17 +35,17 @@ namespace ImGui::Renderer
 				io.IniFilename = nullptr;
 
 				if (!ImGui_ImplWin32_Init(desc.OutputWindow)) {
-					logger::error("ImGui initialization failed (Win32)");
+					REX::ERROR("ImGui initialization failed (Win32)");
 					return;
 				}
 				if (!ImGui_ImplDX11_Init(device, context)) {
-					logger::error("ImGui initialization failed (DX11)"sv);
+					REX::ERROR("ImGui initialization failed (DX11)"sv);
 					return;
 				}
 
 				ImGui::FontStyles::GetSingleton()->LoadFontStyles();
 
-				logger::info("ImGui initialized.");
+				REX::INFO("ImGui initialized.");
 
 				initialized.store(true);
 			}

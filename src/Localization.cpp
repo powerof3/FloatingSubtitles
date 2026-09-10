@@ -34,7 +34,7 @@ std::string to_string(Language lang)
 
 Language to_language(const std::string& string)
 {
-	switch (string::const_hash(string)) {
+	switch (REX::STR::CONST_HASH(string)) {
 	case "CHINESE"_h:
 		return Language::kChinese;
 	case "CZECH"_h:
@@ -128,10 +128,10 @@ void LocalizedSubtitles::ReadILStringFiles(MultiSubtitleToIDMap& a_multiSubToID,
 
 			for (const auto& [stringID, offset] : stringTable.directory) {
 				std::string str = stringTable.GetStringAtOffset(offset);
-				if (str.empty() || string::is_only_space(str)) {
+				if (str.empty() || REX::STR::IS_ONLY_SPACE(str)) {
 					continue;
 				}
-				auto hashedStringID = hash::szudzik_pair(mod->compileIndex, stringID);
+				auto hashedStringID = REX::SZUDZIK_PAIR(mod->compileIndex, stringID);
 				if (language == gameLanguage) {
 					a_multiSubToID[str].emplace(hashedStringID);
 				}
@@ -192,8 +192,8 @@ void LocalizedSubtitles::BuildLocalizedSubtitles()
 {
 	gameLanguage = to_language("sLanguage:General"_ini.value());
 
-	Timer timer;
-	timer.start();
+	REX::FTimer timer;
+	timer.Start();
 
 	MultiSubtitleToIDMap multiSubtitleToID;
 	MultiIDToSubtitleMap multiIDToSubtitle;
@@ -201,9 +201,9 @@ void LocalizedSubtitles::BuildLocalizedSubtitles()
 	ReadILStringFiles(multiSubtitleToID, multiIDToSubtitle);
 	MergeDuplicateSubtitles(multiSubtitleToID, multiIDToSubtitle);
 
-	timer.stop();
+	timer.Stop();
 
-	logger::info("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.duration(), subtitleToID.size());
+	REX::INFO("Parsing .ILSTRINGS files took {}. {} localized strings found", timer.GetDurationStringMin(), subtitleToID.size());
 }
 
 std::string LocalizedSubtitles::ResolveSubtitle(const char* a_localSubtitle, const LanguageSetting& a_language) const

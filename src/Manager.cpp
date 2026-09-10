@@ -71,13 +71,13 @@ void Manager::OnDataLoaded()
 	maxDistanceStartSq = gameMaxDistance * gameMaxDistance;
 	maxDistanceEndSq = (gameMaxDistance * 1.05f) * (gameMaxDistance * 1.05f);
 
-	logger::info("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
+	REX::INFO("Max subtitle distance: {:.2f} (start), {:.2f} (end)", gameMaxDistance, gameMaxDistance * 1.05f);
 
 	speakerColorU32 = "iSubtitleSpeakerNameColor:Interface"_ini.value();
 	speakerColorFloat4 = ImGui::ColorConvertU32ToFloat4(speakerColorU32);
 	speakerColorFloat4.w = 1.0f;
 
-	logger::info("Subtitle speaker color: {},{},{} ({:X})", speakerColorFloat4.x, speakerColorFloat4.y, speakerColorFloat4.z, speakerColorU32);
+	REX::INFO("Subtitle speaker color: {},{},{} ({:X})", speakerColorFloat4.x, speakerColorFloat4.y, speakerColorFloat4.z, speakerColorU32);
 
 	//RE::INIPrefSettingCollection::GetSingleton()->GetSetting("bGeneralSubtitles:Interface")->data.b = true;
 	//RE::INIPrefSettingCollection::GetSingleton()->GetSetting("bDialogueSubtitles:Interface")->data.b = true;
@@ -171,7 +171,7 @@ void Manager::DrawProcessedSubtitle(const RE::BSString& a_subtitle, const DualSu
 
 void Manager::AddSubtitle(RE::SubtitleManager* a_manager, const char* a_subtitle)
 {
-	if (!string::is_empty(a_subtitle) && !string::is_only_space(a_subtitle)) {
+	if (!REX::STR::IS_EMPTY(a_subtitle) && !REX::STR::IS_ONLY_SPACE(a_subtitle)) {
 		AddProcessedSubtitle(a_subtitle);
 
 		RE::BSSpinLockGuard gameLocker(a_manager->lock);

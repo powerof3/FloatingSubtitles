@@ -22,22 +22,22 @@ void ModAPIHandler::BTPS::GetAPI()
 {
 	api = BTPS_API_decl::RequestPluginAPI_V0();
 	if (api) {
-		logger::info("Retrieving BTPS API...");
+		REX::INFO("Retrieving BTPS API...");
 		SettingLoader::GetSingleton()->Load(FileType::kBTPS, [this](auto& ini) {
 			if (api == nullptr || validAPI) {
 				return;
 			}
 			auto widgetPos = ini.GetDoubleValue("Widgets", "fWidgetZOffsetAdditionalNPC", std::numeric_limits<double>::max());  // only available in updated BTPS with new API functions
 			if (widgetPos == std::numeric_limits<double>::max()) {
-				logger::warn("\tBTPS API is outdated!");
+				REX::WARN("\tBTPS API is outdated!");
 				api = nullptr;
 			} else {
-				logger::info("\tBTPS API is up to date!");
+				REX::INFO("\tBTPS API is up to date!");
 				validAPI = true;
 			}
 		});
 	} else {
-		logger::info("Unable to acquire BTPS API");
+		REX::INFO("Unable to acquire BTPS API");
 	}
 }
 
@@ -58,16 +58,16 @@ void ModAPIHandler::BTPS::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std::o
 
 void ModAPIHandler::TrueHUD::GetAPI()
 {
-	logger::info("Retrieving TrueHUD API...");
+	REX::INFO("Retrieving TrueHUD API...");
 	api = reinterpret_cast<TRUEHUD_API::IVTrueHUD4*>(TRUEHUD_API::RequestPluginAPI());
 	if (api) {
-		logger::info("\tTrueHUD API is up to date!");
+		REX::INFO("\tTrueHUD API is up to date!");
 		SettingLoader::GetSingleton()->Load(FileType::kTrueHUD, [this](auto& ini) {
 			infoBarAnchor = static_cast<WidgetAnchor>(ini.GetLongValue("ActorInfoBars", "uInfoBarAnchor", std::to_underlying(WidgetAnchor::kHead)));
 			infoBarOffsetZ = static_cast<float>(ini.GetDoubleValue("ActorInfoBars", "fInfoBarOffsetZ", 30.0));
 		});
 	} else {
-		logger::info("Unable to acquire TrueHUD API");
+		REX::INFO("Unable to acquire TrueHUD API");
 	}
 }
 
@@ -101,12 +101,12 @@ void ModAPIHandler::TrueHUD::GetWidgetPos(const RE::TESObjectREFRPtr& a_ref, std
 
 void ModAPIHandler::NND::GetAPI()
 {
-	logger::info("Retrieving NPCs Names Distributor API...");
+	REX::INFO("Retrieving NPCs Names Distributor API...");
 	api = reinterpret_cast<NND_API::IVNND2*>(NND_API::RequestPluginAPI());
 	if (api) {
-		logger::info("\tNPCs Names Distributor API is up to date!");
+		REX::INFO("\tNPCs Names Distributor API is up to date!");
 	} else {
-		logger::info("\tUnable to acquire NPCs Names Distributor API");
+		REX::INFO("\tUnable to acquire NPCs Names Distributor API");
 	}
 }
 
@@ -135,7 +135,7 @@ void ModAPIHandler::LoadAPIs()
 	nnd.GetAPI();
 
 	altCCInstalled = GetModuleHandle(L"AlternateConversationCamera.dll");
-	logger::info("Alternate Conversation Camera: {}", altCCInstalled ? "Loaded" : "Not loaded");
+	REX::INFO("Alternate Conversation Camera: {}", altCCInstalled ? "Loaded" : "Not loaded");
 }
 
 std::optional<float> ModAPIHandler::GetWidgetPosZ(const RE::TESObjectREFRPtr& a_ref, bool a_BTPS, bool a_trueHUD) const

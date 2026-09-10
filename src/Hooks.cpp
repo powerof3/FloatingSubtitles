@@ -47,8 +47,8 @@ namespace Hooks
 							"WorldMapMode"sv,
 							"BookMode"sv,
 							"JournalMode"sv
-						};
-						if (std::ranges::any_of(badModes, [&](const auto& mode) { return string::iequals(hudData->text, mode); })) {
+						};	
+						if (std::ranges::any_of(badModes, [&](const auto& mode) { return REX::STR::IEQUALS(hudData->text, mode); })) {
 							Manager::GetSingleton()->SetVisible(!hudData->show);
 						}
 					}
@@ -94,6 +94,6 @@ namespace Hooks
 		stl::write_vfunc<RE::HUDMenu, HUDMenu_ProcessMessage>();
 		stl::write_vfunc<RE::DialogueMenu, DialogueMenu_ProcessMessage>();
 
-		logger::info("Installed subtitle hooks");
+		REX::INFO("Installed subtitle hooks");
 	}
 }

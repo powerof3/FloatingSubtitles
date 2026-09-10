@@ -6,22 +6,18 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "RE/Skyrim.h"
-#include "REX/REX/Singleton.h"
+#include "REX/REX.h"
 #include "SKSE/SKSE.h"
 
 #include <dxgi.h>
 #include <shared_mutex>
 #include <shlobj.h>
 
-#include <ClibUtil/simpleINI.hpp>
-#include <ClibUtil/string.hpp>
-#include <ClibUtil/timer.hpp>
-
 #include <boost/unordered/unordered_flat_map.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
 #include <freetype/freetype.h>
 #include <spdlog/sinks/basic_file_sink.h>
-#include <srell.hpp>
+#include <boost/regex.hpp>
 #include <xbyak/xbyak.h>
 
 #include "imgui_impl_win32.h"
@@ -31,14 +27,12 @@
 #include <imgui_impl_dx11.h>
 #include <imgui_stdlib.h>
 
-#define DLLEXPORT __declspec(dllexport)
+#include <SimpleIni.h>
+#undef ERROR
 
 using namespace std::literals;
-using namespace clib_util;
-using namespace string::literals;
 using namespace RE::literals;
-
-namespace logger = SKSE::log;
+using namespace REX::STR::literals;
 
 template <class K, class D, class H = boost::hash<K>, class KEqual = std::equal_to<K>>
 using FlatMap = boost::unordered_flat_map<K, D, H, KEqual>;
@@ -64,12 +58,10 @@ namespace RE
 
 namespace stl
 {
-	using namespace SKSE::stl;
-
 	template <class T>
 	void write_thunk_call(std::uintptr_t a_src)
 	{
-		auto& trampoline = SKSE::GetTrampoline();
+		auto& trampoline = REL::GetTrampoline();
 		T::func = trampoline.write_call<5>(a_src, T::thunk);
 	}
 
@@ -100,8 +92,8 @@ namespace stl
 		Patch p(a_src, BYTES);
 		p.ready();
 
-		auto& trampoline = SKSE::GetTrampoline();
-		trampoline.write_branch<5>(a_src, T::thunk);
+		auto& trampoline = REL::GetTrampoline();
+		trampoline.write_jmp<5>(a_src, T::thunk);
 
 		auto alloc = trampoline.allocate(p.getSize());
 		std::memcpy(alloc, p.getCode(), p.getSize());
@@ -121,6 +113,18 @@ namespace stl
 
 		return enum_range;
 	};
+}
+
+namespace Runtime
+{
+	inline constexpr REL::Version SSE_1_7_99(1, 7, 99, 0);
+	inline constexpr REL::Version MIN_ADDRESS_LIBRARY_V5 = SSE_1_7_99;
+
+	[[nodiscard]] inline bool IsAtLeast1_7_99() noexcept
+	{
+		static bool result = REX::FModule::GetExecutingModule().GetFileVersion() >= Runtime::SSE_1_7_99;
+		return result;
+	}
 }
 
 #ifdef SKYRIM_AE

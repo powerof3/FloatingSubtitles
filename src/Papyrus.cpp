@@ -17,7 +17,7 @@ namespace Papyrus
 
 		a_vm->RegisterFunction("OnConfigClose", MCM, OnConfigClose);
 
-		logger::info("Registered {} class", MCM);
+		REX::INFO("Registered {} class", MCM);
 
 		return true;
 	}

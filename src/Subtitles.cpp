@@ -67,7 +67,7 @@ void Subtitle::WrapCJKText(std::vector<Line>& lines, const std::string& text, st
 
 void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, std::uint32_t maxLineWidth)
 {
-	static const srell::regex fontRegex(R"(<font\s+face=['"]([^'"]+)['"]>(.*?)</font>)", srell::regex::optimize);
+	static const boost::regex fontRegex(R"(<font\s+face=['"]([^'"]+)['"]>(.*?)</font>)", boost::regex::optimize);
 
 	std::vector<Word> currentWords;
 	bool              currentDragonFont = false;
@@ -184,10 +184,10 @@ void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, 
 		bool        wordHasDragonFont = false;
 		std::string strippedWord;
 
-		srell::smatch match;
+		boost::smatch match;
 		std::string   remaining = token;
 
-		while (srell::regex_search(remaining, match, fontRegex)) {
+		while (boost::regex_search(remaining, match, fontRegex)) {
 			hasFontTag = true;
 			const std::string& font = match[1].str();
 			const std::string& innerText = match[2].str();
@@ -206,10 +206,10 @@ void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, 
 		strippedWord += remaining;
 
 		if (hasFontTag && !strippedWord.empty()) {
-			static const srell::regex trailingPunct(R"(^(.+?)([!?,.:;]+)$)");
-			srell::smatch             punctMatch;
+			static const boost::regex trailingPunct(R"(^(.+?)([!?,.:;]+)$)");
+			boost::smatch             punctMatch;
 
-			if (srell::regex_match(strippedWord, punctMatch, trailingPunct)) {
+			if (boost::regex_match(strippedWord, punctMatch, trailingPunct)) {
 				std::string mainWord = punctMatch[1].str();
 				std::string punct = punctMatch[2].str();
 
@@ -230,18 +230,18 @@ void Subtitle::WrapLatinText(std::vector<Line>& lines, const std::string& text, 
 
 std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 {
-	static const srell::regex br_tag(R"(<br\s*/?>)", srell::regex::optimize);
-	static const srell::regex re(R"([^ \t\n\v\f\r<]*<[^>]+/>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r<]*<[^>]+>(?:[^<]|<(?!/))*?</[^>]+>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r]+)", srell::regex::optimize);
+	static const boost::regex br_tag(R"(<br\s*/?>)", boost::regex::optimize);
+	static const boost::regex re(R"([^ \t\n\v\f\r<]*<[^>]+/>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r<]*<[^>]+>(?:[^<]|<(?!/))*?</[^>]+>(?:[^ \t\n\v\f\r<>])*|[^ \t\n\v\f\r]+)", boost::regex::optimize);
 
 	std::vector<std::string> result;
 	std::string              remaining = a_text;
-	srell::smatch            match;
+	boost::smatch            match;
 
-	while (srell::regex_search(remaining, match, br_tag)) {
+	while (boost::regex_search(remaining, match, br_tag)) {
 		std::string prefix = match.prefix().str();
 		if (!prefix.empty()) {
-			for (auto it = srell::sregex_iterator(prefix.begin(), prefix.end(), re);
-				 it != srell::sregex_iterator(); ++it) {
+			for (auto it = boost::sregex_iterator(prefix.begin(), prefix.end(), re);
+				 it != boost::sregex_iterator(); ++it) {
 				result.push_back(it->str());
 			}
 		}
@@ -252,8 +252,8 @@ std::vector<std::string> Subtitle::SplitText(const std::string& a_text)
 	}
 
 	if (!remaining.empty()) {
-		for (auto it = srell::sregex_iterator(remaining.begin(), remaining.end(), re);
-			 it != srell::sregex_iterator(); ++it) {
+		for (auto it = boost::sregex_iterator(remaining.begin(), remaining.end(), re);
+			 it != boost::sregex_iterator(); ++it) {
 			result.push_back(it->str());
 		}
 	}

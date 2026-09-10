@@ -26,7 +26,7 @@ namespace ImGui
 		font = io.Fonts->AddFontFromFileTTF(name.c_str(), size, &config);
 
 		std::error_code ec;
-		logger::info("Loaded font [{}|size: {}|spacing: {}] : {}", name, size, spacing, std::filesystem::exists(name, ec));
+		REX::INFO("Loaded font [{}|size: {}|spacing: {}] : {}", name, size, spacing, std::filesystem::exists(name, ec));
 	}
 
 	void FontStyles::LoadFonts()
@@ -35,7 +35,7 @@ namespace ImGui
 
 		auto& io = ImGui::GetIO();
 		if (UsingDefaultFont()) {
-			logger::info("Using default font...");
+			REX::INFO("Using default font...");
 			config.GlyphExtraAdvanceX = futuraFont.spacing;
 			// futuraFont.size already includes GetResolutionScale() (applied in
 			// LoadFontSettings); applying it again double-scales the default font at

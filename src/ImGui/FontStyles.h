@@ -27,7 +27,7 @@ namespace ImGui
 		float  shadowOffsetVar{ 3.0f };
 	};
 
-	class FontStyles : public REX::Singleton<FontStyles>
+	class FontStyles : public REX::TSingleton<FontStyles>
 	{
 	public:
 		void LoadStyleSettings(CSimpleIniA& a_ini);
@@ -61,13 +61,13 @@ namespace ImGui
 	inline std::pair<T, bool> FontStyles::ToStyle(const std::string& a_str)
 	{
 		if constexpr (std::is_same_v<ImVec4, T>) {
-			static srell::regex rgb_pattern("([0-9]+),([0-9]+),([0-9]+),([0-9]+)");
-			static srell::regex hex_pattern("#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})");
+			static boost::regex rgb_pattern("([0-9]+),([0-9]+),([0-9]+),([0-9]+)");
+			static boost::regex hex_pattern("#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})");
 
-			srell::smatch rgb_matches;
-			srell::smatch hex_matches;
+			boost::smatch rgb_matches;
+			boost::smatch hex_matches;
 
-			if (srell::regex_match(a_str, rgb_matches, rgb_pattern)) {
+			if (boost::regex_match(a_str, rgb_matches, rgb_pattern)) {
 				auto red = std::stoi(rgb_matches[1]);
 				auto green = std::stoi(rgb_matches[2]);
 				auto blue = std::stoi(rgb_matches[3]);
@@ -75,7 +75,7 @@ namespace ImGui
 
 				return { { red / 255.0f, green / 255.0f, blue / 255.0f, alpha / 255.0f }, false };
 			}
-			if (srell::regex_match(a_str, hex_matches, hex_pattern)) {
+			if (boost::regex_match(a_str, hex_matches, hex_pattern)) {
 				auto red = std::stoi(hex_matches[1], 0, 16);
 				auto green = std::stoi(hex_matches[2], 0, 16);
 				auto blue = std::stoi(hex_matches[3], 0, 16);
@@ -86,7 +86,7 @@ namespace ImGui
 
 			return { T(), false };
 		} else {
-			return { string::to_num<T>(a_str), false };
+			return { REX::STR::TO_NUM<T>(a_str), false };
 		}
 	}
 
